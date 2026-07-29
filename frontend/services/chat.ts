@@ -21,11 +21,20 @@ export async function streamChatMessage(
     data: { session },
   } = await supabase.auth.getSession();
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
+  if (!session?.access_token) {
+    throw new Error("Please log in before using AI Chat.");
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    throw new Error("AI Chat is not configured. Missing NEXT_PUBLIC_API_URL.");
+  }
+
+  const response = await fetch(`${apiUrl}/api/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session?.access_token}`,
+      Authorization: `Bearer ${session.access_token}`,
     },
     body: JSON.stringify({ message, conversation_id: conversationId }),
     signal,
