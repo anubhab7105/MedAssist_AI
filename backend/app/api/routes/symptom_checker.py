@@ -26,7 +26,7 @@ async def check_symptoms(
             severity=Severity.emergency,
         )
         await supabase_service.save_symptom_check(
-            user.user_id, payload.model_dump(mode="json"), response.model_dump(mode="json")
+            user.user_id, payload.model_dump(mode="json"), response.model_dump(mode="json"), user.email
         )
         return response
 
@@ -47,7 +47,7 @@ async def check_symptoms(
     )
 
     await supabase_service.save_symptom_check(
-        user.user_id, payload.model_dump(mode="json"), response.model_dump(mode="json")
+        user.user_id, payload.model_dump(mode="json"), response.model_dump(mode="json"), user.email
     )
 
     return response

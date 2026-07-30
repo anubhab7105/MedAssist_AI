@@ -17,6 +17,8 @@ export function useChat() {
 
   const sendMessage = useCallback(async (content: string) => {
     setError(null);
+    conversationId.current ??= genId();
+
     const userMessage: ChatMessage = {
       id: genId(),
       role: "user",

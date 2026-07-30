@@ -4,6 +4,7 @@ interest around a given lat/lng, and ranks results by distance.
 """
 
 import math
+import logging
 
 import httpx
 
@@ -11,6 +12,13 @@ from app.core.config import get_settings
 from app.models.schemas import NearbyPlace, PlaceType
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
+
+_OVERPASS_URLS = [
+    settings.overpass_api_url,
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.openstreetmap.ru/api/interpreter",
+]
 
 # Maps our PlaceType enum to the OSM tags that identify it.
 _OSM_TAGS: dict[PlaceType, list[str]] = {
@@ -41,6 +49,7 @@ def _build_query(lat: float, lng: float, radius_m: int, place_type: PlaceType | 
         key, _, value = tag.partition("=")
         clauses.append(f'node["{key}"="{value}"](around:{radius_m},{lat},{lng});')
         clauses.append(f'way["{key}"="{value}"](around:{radius_m},{lat},{lng});')
+        clauses.append(f'relation["{key}"="{value}"](around:{radius_m},{lat},{lng});')
 
     body = "\n  ".join(clauses)
     return f"""
@@ -71,10 +80,22 @@ async def find_nearby_places(
 ) -> list[NearbyPlace]:
     query = _build_query(lat, lng, radius_m, place_type)
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(settings.overpass_api_url, data={"data": query})
-        response.raise_for_status()
-        data = response.json()
+    data = None
+    errors: list[str] = []
+    timeout = httpx.Timeout(12.0, connect=5.0)
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        for url in dict.fromkeys(_OVERPASS_URLS):
+            try:
+                response = await client.post(url, data={"data": query})
+                response.raise_for_status()
+                data = response.json()
+                break
+            except httpx.HTTPError as exc:
+                errors.append(f"{url}: {exc}")
+
+    if data is None:
+        logger.warning("All Overpass providers failed: %s", " | ".join(errors))
+        raise httpx.HTTPError("All Overpass providers failed")
 
     results: list[NearbyPlace] = []
     for element in data.get("elements", []):

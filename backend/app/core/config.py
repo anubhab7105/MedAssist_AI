@@ -40,6 +40,23 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
 
+    @property
+    def cors_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.frontend_url.split(",")
+            if origin.strip()
+        ]
+
+    @property
+    def supabase_project_url(self) -> str:
+        return (
+            self.supabase_url.strip()
+            .removesuffix("/")
+            .removesuffix("/rest/v1")
+            .removesuffix("/auth/v1")
+        )
+
 
 @lru_cache
 def get_settings() -> "Settings":

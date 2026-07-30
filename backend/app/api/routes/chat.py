@@ -41,12 +41,18 @@ async def chat(
             yield f"data: {json.dumps({'type': 'emergency', 'content': message})}\n\n"
             yield "data: [DONE]\n\n"
 
-        await supabase_service.save_chat_message(user.user_id, payload.conversation_id, "user", payload.message)
-        await supabase_service.save_chat_message(user.user_id, payload.conversation_id, "assistant", message)
+        await supabase_service.save_chat_message(
+            user.user_id, payload.conversation_id, "user", payload.message, user.email
+        )
+        await supabase_service.save_chat_message(
+            user.user_id, payload.conversation_id, "assistant", message, user.email
+        )
 
         return StreamingResponse(emergency_stream(), media_type="text/event-stream")
 
-    await supabase_service.save_chat_message(user.user_id, payload.conversation_id, "user", payload.message)
+    await supabase_service.save_chat_message(
+        user.user_id, payload.conversation_id, "user", payload.message, user.email
+    )
 
     async def token_stream():
         full_response = ""
@@ -57,7 +63,7 @@ async def chat(
         finally:
             if full_response:
                 await supabase_service.save_chat_message(
-                    user.user_id, payload.conversation_id, "assistant", full_response
+                    user.user_id, payload.conversation_id, "assistant", full_response, user.email
                 )
         yield "data: [DONE]\n\n"
 
