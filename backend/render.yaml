@@ -3,26 +3,43 @@ services:
     name: medassist-ai-backend
     env: python
     plan: free
+
+    rootDir: backend
+
     buildCommand: pip install -r requirements.txt
+
     startCommand: gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+
       - key: ENVIRONMENT
         value: production
+
       - key: FRONTEND_URL
         sync: false
+
       - key: SECRET_KEY
         sync: false
+
       - key: SUPABASE_URL
         sync: false
+
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+
       - key: SUPABASE_JWT_SECRET
         sync: false
+
       - key: GROQ_API_KEY
         sync: false
+
       - key: GROQ_MODEL
         value: llama-3.3-70b-versatile
+
       - key: OVERPASS_API_URL
         value: https://overpass-api.de/api/interpreter
+
       - key: RATE_LIMIT_PER_MINUTE
         value: "20"
