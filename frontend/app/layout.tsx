@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "MedAssist AI — Educational Health Guidance",
   description:
     "Understand your symptoms, chat with an AI health assistant, and find nearby care — all educational, never a diagnosis.",
-  metadataBase: new URL("https://medassist-ai.vercel.app"),
+  metadataBase: new URL("https://medassist-ctrlv.vercel.app"),
   openGraph: {
     title: "MedAssist AI",
     description:

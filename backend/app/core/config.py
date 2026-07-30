@@ -16,7 +16,10 @@ class Settings(BaseSettings):
 
     # --- App ---
     environment: str = "development"
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: list[str] = [
+    "http://localhost:3000",
+    "https://medassist-ctrlv.vercel.app",
+    ]
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
@@ -44,7 +47,7 @@ class Settings(BaseSettings):
     def cors_origins(self) -> list[str]:
         return [
             origin.strip()
-            for origin in self.frontend_url.split(",")
+            for origin in self.frontend_url
             if origin.strip()
         ]
 
