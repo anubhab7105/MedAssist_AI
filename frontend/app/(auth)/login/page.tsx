@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { GoogleButton } from "@/components/shared/google-button";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -58,12 +57,6 @@ export default function LoginPage() {
         <CardDescription>Log in to continue to your dashboard.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <GoogleButton />
-
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-white/10" /> OR <div className="h-px flex-1 bg-white/10" />
-        </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

@@ -25,9 +25,8 @@ Overpass API (nearby care) + Leaflet (maps).
 2. In the SQL editor, run `backend/supabase_schema.sql`. This creates the `users`,
    `chat_history`, `symptom_history`, and `saved_locations` tables, a trigger that
    auto-creates a `users` row on signup, and Row Level Security policies.
-3. In **Authentication → Providers**, enable **Email** and **Google**.
-   For Google, you'll need OAuth credentials from the Google Cloud Console; add the
-   Supabase callback URL shown in the provider settings.
+3. In **Authentication → Providers**, enable **Email** only for Supabase auth.
+   This app uses Supabase email/password sign-in and sign-up.
 4. In **Authentication → URL Configuration**, add your frontend URL (e.g.
    `http://localhost:3000` for local dev, your Vercel URL for production) to the
    redirect URLs, and set the site URL.
