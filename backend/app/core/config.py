@@ -16,10 +16,7 @@ class Settings(BaseSettings):
 
     # --- App ---
     environment: str = "development"
-    frontend_url: list[str] = [
-    "http://localhost:3000",
-    "https://medassist-ctrlv.vercel.app",
-    ]
+    frontend_url: list[str]
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
