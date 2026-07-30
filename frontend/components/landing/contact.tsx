@@ -29,7 +29,7 @@ export function Contact() {
           <p className="text-sm font-medium text-primary">Get in touch</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Questions or feedback?</h2>
           <p className="mt-4 max-w-md text-muted-foreground">
-            Whether it's a bug report, a feature idea, or a partnership inquiry — we read everything.
+            Whether it&apos;s a bug report, a feature idea, or a partnership inquiry — we read everything.
           </p>
           <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
             <Mail className="h-4 w-4" /> support@medassist.ai

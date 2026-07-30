@@ -72,7 +72,7 @@ export function Hero() {
 
             <div className="space-y-3 py-5">
               <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-primary/90 px-4 py-2.5 text-sm text-white">
-                I've had a dull headache and mild nausea since this morning.
+                I&apos;ve had a dull headache and mild nausea since this morning.
               </div>
               <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white/[0.06] px-4 py-3 text-sm leading-relaxed">
                 Thanks for sharing that. Possible contributors include

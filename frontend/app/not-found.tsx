@@ -10,7 +10,7 @@ export default function NotFound() {
       </span>
       <h1 className="text-3xl font-semibold tracking-tight">Page not found</h1>
       <p className="max-w-sm text-muted-foreground">
-        The page you're looking for doesn't exist or may have moved.
+        The page you&apos;re looking for doesn&apos;t exist or may have moved.
       </p>
       <Button asChild>
         <Link href="/">Back to home</Link>

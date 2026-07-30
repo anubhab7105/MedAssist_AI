@@ -38,7 +38,7 @@ export default function ChatPage() {
             <div>
               <h2 className="font-medium">Start a conversation</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Describe what you're experiencing and get calm, educational guidance.
+                Describe what you&apos;re experiencing and get calm, educational guidance.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">

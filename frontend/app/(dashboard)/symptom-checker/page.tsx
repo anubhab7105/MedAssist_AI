@@ -29,7 +29,7 @@ export default function SymptomCheckerPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">AI Symptom Checker</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Share what you're experiencing for a structured, educational summary.
+          Share what you&apos;re experiencing for a structured, educational summary.
         </p>
       </div>
 

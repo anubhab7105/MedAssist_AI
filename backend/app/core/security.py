@@ -1,8 +1,8 @@
 """
 JWT verification for requests authenticated via Supabase Auth.
 
-The frontend signs users in through Supabase directly (email/password or
-Google OAuth) and attaches the resulting access token as a Bearer token
+The frontend signs users in through Supabase directly (email/password)
+and attaches the resulting access token as a Bearer token
 on every API request. The backend never issues its own session tokens —
 it only verifies the ones Supabase already issued, using the project's
 JWT secret.

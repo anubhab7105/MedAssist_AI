@@ -1,5 +1,5 @@
 """
-Actual sign-up / sign-in / OAuth / password reset all happen directly
+Actual sign-up / sign-in / password reset all happen directly
 between the frontend and Supabase Auth (that's what the Supabase JS SDK
 is for — the backend never sees passwords). This route only exposes what
 the backend needs: a way to confirm a token is valid and see who it
