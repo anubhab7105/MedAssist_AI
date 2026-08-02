@@ -9,8 +9,8 @@ const TRUST = ["HIPAA aware", "GDPR ready", "Secure guidance"];
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-background pt-20">
-      <div className="container grid min-h-[660px] gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+    <section className="relative overflow-hidden bg-background">
+      <div className="container grid min-h-[660px] gap-12 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
