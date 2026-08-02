@@ -43,20 +43,6 @@ export function Hero() {
               <Link href="/chat">View Demo</Link>
             </Button>
           </div>
-
-          <div className="mt-12 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <div className="flex -space-x-2">
-              {["DR", "AI", "RN"].map((label) => (
-                <span
-                  key={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-[#dce9ff] text-[10px] font-semibold text-primary"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-            <span>Trusted by 500+ clinics nationwide</span>
-          </div>
         </motion.div>
 
         <motion.div
