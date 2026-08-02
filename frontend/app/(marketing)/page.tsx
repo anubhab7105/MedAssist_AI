@@ -13,8 +13,12 @@ export default function HomePage() {
       <Features />
       <HowItWorks />
       <Screenshots />
-      <FAQ />
-      <CTA />
+      <section className="container py-24">
+        <div className="grid items-start gap-8 lg:grid-cols-2">
+          <CTA />
+          <FAQ />
+        </div>
+      </section>
       <Contact />
     </>
   );
