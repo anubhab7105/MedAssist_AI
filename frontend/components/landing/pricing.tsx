@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const TIERS = [
   {
@@ -27,22 +28,33 @@ export function Pricing() {
     <section id="pricing" className="container py-24">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-accent">Pricing</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Start free, upgrade later</h2>
+        <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          Start free, upgrade later
+        </h2>
         <p className="mt-4 text-muted-foreground">Plus-tier pricing is still being finalized.</p>
       </div>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2 sm:max-w-2xl">
         {TIERS.map((tier) => (
-          <Card key={tier.name} className={tier.highlighted ? "border-primary/40 shadow-glow" : ""}>
+          <Card
+            key={tier.name}
+            className={cn(
+              "card-hover",
+              tier.highlighted && "relative overflow-hidden border-primary/30 shadow-glow"
+            )}
+          >
+            {tier.highlighted && (
+              <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent" />
+            )}
             <CardHeader>
               <p className="text-sm text-muted-foreground">{tier.name}</p>
-              <p className="text-3xl font-semibold">{tier.price}</p>
+              <p className="text-3xl font-semibold text-foreground">{tier.price}</p>
               <p className="text-sm text-muted-foreground">{tier.description}</p>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2.5">
                 {tier.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
+                  <li key={f} className="flex items-center gap-2 text-sm text-foreground/90">
                     <Check className="h-4 w-4 text-success" /> {f}
                   </li>
                 ))}

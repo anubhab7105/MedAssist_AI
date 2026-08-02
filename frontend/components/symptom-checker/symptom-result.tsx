@@ -9,9 +9,11 @@ import type { SymptomCheckResponse } from "@/types";
 export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
   if (result.isEmergency) {
     return (
-      <Card className="border-danger/40 bg-danger/10">
+      <Card className="border-danger/30 bg-danger/5">
         <CardContent className="flex items-start gap-4 p-6">
-          <AlertTriangle className="mt-0.5 h-8 w-8 shrink-0 text-danger" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-danger/10">
+            <AlertTriangle className="h-5 w-5 text-danger" />
+          </span>
           <div>
             <h3 className="text-lg font-semibold text-danger">Emergency detected</h3>
             <p className="mt-2 text-sm leading-relaxed text-danger/90">{result.emergencyMessage}</p>
@@ -47,7 +49,7 @@ export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
           <CardContent>
             <ul className="space-y-2">
               {result.possibleConditions.map((c) => (
-                <li key={c} className="flex items-start gap-2 text-sm">
+                <li key={c} className="flex items-start gap-2 text-sm text-foreground/90">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /> {c}
                 </li>
               ))}
@@ -67,7 +69,7 @@ export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
             <CardContent>
               <ul className="space-y-2">
                 {result.lifestyleSuggestions.map((s) => (
-                  <li key={s} className="flex items-start gap-2 text-sm">
+                  <li key={s} className="flex items-start gap-2 text-sm text-foreground/90">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" /> {s}
                   </li>
                 ))}
@@ -86,7 +88,7 @@ export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
             <CardContent>
               <ul className="space-y-2">
                 {result.emergencyWarnings.map((w) => (
-                  <li key={w} className="flex items-start gap-2 text-sm">
+                  <li key={w} className="flex items-start gap-2 text-sm text-foreground/90">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning" /> {w}
                   </li>
                 ))}
@@ -97,7 +99,7 @@ export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
       </div>
 
       {result.recommendedSpecialist && (
-        <Card className="border-primary/30 bg-primary/5">
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
           <CardContent className="flex items-center justify-between p-5">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Recommended specialist</p>

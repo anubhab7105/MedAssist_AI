@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --background: 222 47% 8%;      /* #0F172A */
-    --foreground: 210 40% 96%;
-    --border: 217 33% 22%;
-    --input: 217 33% 22%;
-    --ring: 217 91% 60%;
+    --background: 210 45% 98%;     /* #F6F9FC — soft paper */
+    --foreground: 222 39% 15%;     /* #18233A — ink navy */
+    --border: 220 24% 90%;         /* #DEE4EE */
+    --input: 220 22% 89%;
+    --ring: 221 83% 58%;           /* matches primary */
   }
 
   * {
@@ -17,7 +17,7 @@
 
   html {
     @apply scroll-smooth;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -26,7 +26,7 @@
   }
 
   ::selection {
-    @apply bg-primary/30 text-foreground;
+    @apply bg-primary/20 text-foreground;
   }
 
   /* Visible keyboard focus everywhere — never suppressed */
@@ -42,27 +42,41 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded-full;
+    @apply bg-slate-300 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-500;
+    @apply bg-slate-400;
   }
 }
 
 @layer utilities {
+  /* Light "frosted glass" surface used for floating panels */
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-white/[0.06];
+    @apply bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_-12px_rgba(30,64,175,0.18)];
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
 
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      linear-gradient(to right, rgba(30, 41, 59, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.05) 1px, transparent 1px);
     background-size: 44px 44px;
+  }
+
+  /* Signature background wash — soft multi-hue gradient bloom.
+     Reused across hero, CTA, auth, and empty states to tie the product together. */
+  .bg-aurora {
+    background-image:
+      radial-gradient(ellipse 60% 50% at 12% -10%, rgba(47, 111, 237, 0.16), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 88% 0%, rgba(14, 168, 139, 0.14), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 100%, rgba(139, 124, 246, 0.12), transparent 60%);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(30,64,175,0.22)];
   }
 }
 
@@ -77,18 +91,23 @@
   }
 }
 
-/* Leaflet map dark-theme tweaks */
+/* Leaflet light-theme tweaks — keep the natural light OSM tiles,
+   just soften the chrome to match the product's rounded, airy UI. */
 .leaflet-container {
-  background: #1e293b !important;
+  background: #eef2f8 !important;
   font-family: inherit !important;
 }
-.leaflet-popup-content-wrapper,
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  color: #18233a !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 32px -12px rgba(30, 64, 175, 0.28) !important;
+}
 .leaflet-popup-tip {
-  background: #1e293b !important;
-  color: #f1f5f9 !important;
+  background: #ffffff !important;
 }
 .leaflet-control-zoom a {
-  background: #1e293b !important;
-  color: #f1f5f9 !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
+  background: #ffffff !important;
+  color: #18233a !important;
+  border-color: #dee4ee !important;
 }

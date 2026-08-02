@@ -14,21 +14,19 @@ const VITALS = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-grid pt-20 pb-24 sm:pt-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[500px] bg-[radial-gradient(ellipse_at_top,_rgba(37,99,235,0.18),transparent_60%)]" />
-
+    <section className="relative overflow-hidden bg-grid bg-aurora pt-20 pb-24 sm:pt-28">
       <div className="container relative grid gap-16 lg:grid-cols-2 lg:items-center">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-muted-foreground">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white/80 px-3 py-1 text-xs text-muted-foreground shadow-sm">
             <Sparkles className="h-3.5 w-3.5 text-accent" />
             Educational guidance, not a diagnosis
           </div>
 
-          <h1 className="mt-6 text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="mt-6 font-display text-4xl font-medium leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-[3.4rem]">
             Understand what your body
             <span className="text-gradient"> is telling you</span>
           </h1>
@@ -62,8 +60,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="relative"
         >
-          <div className="glass rounded-3xl p-5 shadow-glow">
-            <div className="flex items-center gap-2 border-b border-white/[0.06] pb-4">
+          <div className="glass animate-float rounded-3xl p-5">
+            <div className="flex items-center gap-2 border-b border-border pb-4">
               <span className="h-2.5 w-2.5 rounded-full bg-danger/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-warning/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-success/70" />
@@ -71,10 +69,10 @@ export function Hero() {
             </div>
 
             <div className="space-y-3 py-5">
-              <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-primary/90 px-4 py-2.5 text-sm text-white">
+              <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-primary to-primary/90 px-4 py-2.5 text-sm text-white shadow-sm">
                 I&apos;ve had a dull headache and mild nausea since this morning.
               </div>
-              <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white/[0.06] px-4 py-3 text-sm leading-relaxed">
+              <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-border bg-white px-4 py-3 text-sm leading-relaxed text-foreground shadow-sm">
                 Thanks for sharing that. Possible contributors include
                 dehydration, tension headaches, or skipped meals — not a
                 diagnosis, just possibilities worth ruling out. Have you had
@@ -86,17 +84,17 @@ export function Hero() {
               </div>
             </div>
 
-            <PulseLine className="h-8 w-full opacity-70" />
+            <PulseLine className="h-8 w-full opacity-80" />
           </div>
 
-          <div className="absolute -bottom-6 -right-4 hidden w-56 rounded-2xl border border-white/10 bg-card/90 p-4 shadow-soft backdrop-blur-xl sm:block">
+          <div className="absolute -bottom-6 -right-4 hidden w-56 rounded-2xl border border-border bg-white/95 p-4 shadow-popover backdrop-blur-xl sm:block">
             <p className="text-xs text-muted-foreground">Recommended specialist</p>
             <p className="mt-1 font-medium text-secondary">Neurologist</p>
           </div>
         </motion.div>
       </div>
 
-      <div className="container mt-20 grid gap-6 border-t border-white/[0.06] pt-10 sm:grid-cols-3">
+      <div className="container mt-20 grid gap-6 border-t border-border pt-10 sm:grid-cols-3">
         {VITALS.map((v) => (
           <div key={v.label}>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">{v.label}</p>

@@ -11,9 +11,9 @@ import { getChatHistory, getSymptomHistory } from "@/services/profile";
 import { formatRelativeTime, severityColor } from "@/lib/utils";
 
 const QUICK_ACTIONS = [
-  { href: "/chat", label: "Start AI Chat", description: "Ask a health question", icon: MessageSquare },
-  { href: "/symptom-checker", label: "Check Symptoms", description: "Structured symptom review", icon: Stethoscope },
-  { href: "/doctors-near-me", label: "Find Care Nearby", description: "Doctors, clinics & pharmacies", icon: MapPin },
+  { href: "/chat", label: "Start AI Chat", description: "Ask a health question", icon: MessageSquare, tint: "from-primary/15 to-primary/5 text-primary" },
+  { href: "/symptom-checker", label: "Check Symptoms", description: "Structured symptom review", icon: Stethoscope, tint: "from-secondary/15 to-secondary/5 text-secondary" },
+  { href: "/doctors-near-me", label: "Find Care Nearby", description: "Doctors, clinics & pharmacies", icon: MapPin, tint: "from-accent/15 to-accent/5 text-accent" },
 ];
 
 export default function DashboardPage() {
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Welcome back{firstName ? `, ${firstName}` : ""}
         </h1>
         <p className="mt-1 text-muted-foreground">Here&apos;s a quick look at your health workspace.</p>
@@ -43,13 +43,13 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         {QUICK_ACTIONS.map((action) => (
           <Link key={action.href} href={action.href}>
-            <Card className="group h-full transition-colors hover:border-primary/40 hover:bg-card/80">
+            <Card className="card-hover group h-full hover:border-primary/30">
               <CardContent className="flex items-start justify-between p-5">
                 <div>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.tint}`}>
                     <action.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mt-3 font-medium">{action.label}</h3>
+                  <h3 className="mt-3 font-medium text-foreground">{action.label}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{action.description}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
@@ -63,7 +63,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Recent chats</CardTitle>
-            <Link href="/chat" className="text-xs text-primary hover:underline">
+            <Link href="/chat" className="text-xs font-medium text-primary hover:underline">
               Open chat
             </Link>
           </CardHeader>
@@ -78,8 +78,8 @@ export default function DashboardPage() {
               <EmptyState icon={MessageSquare} text="No conversations yet. Start one to see it here." />
             )}
             {chatHistory?.slice(0, 4).map((entry: any) => (
-              <div key={entry.id} className="rounded-xl border border-white/[0.06] p-3">
-                <p className="line-clamp-2 text-sm">{entry.content}</p>
+              <div key={entry.id} className="rounded-xl border border-border bg-white p-3 transition-colors hover:border-primary/30">
+                <p className="line-clamp-2 text-sm text-foreground">{entry.content}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
               </div>
             ))}
@@ -89,7 +89,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Recent symptom checks</CardTitle>
-            <Link href="/symptom-checker" className="text-xs text-primary hover:underline">
+            <Link href="/symptom-checker" className="text-xs font-medium text-primary hover:underline">
               New check
             </Link>
           </CardHeader>
@@ -104,9 +104,9 @@ export default function DashboardPage() {
               <EmptyState icon={Stethoscope} text="No symptom checks yet. Run one to see it here." />
             )}
             {symptomHistory?.slice(0, 4).map((entry: any) => (
-              <div key={entry.id} className="flex items-center justify-between rounded-xl border border-white/[0.06] p-3">
+              <div key={entry.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 transition-colors hover:border-primary/30">
                 <div className="min-w-0">
-                  <p className="truncate text-sm">{entry.request_payload?.symptoms}</p>
+                  <p className="truncate text-sm text-foreground">{entry.request_payload?.symptoms}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
                 </div>
                 {entry.response_payload?.severity && (
@@ -147,14 +147,14 @@ function SummaryStat({ label, value }: { label: string; value: string | number }
   return (
     <div>
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-gradient">{value}</p>
     </div>
   );
 }
 
 function EmptyState({ icon: Icon, text }: { icon: any; text: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-white/10 py-8 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border py-8 text-center">
       <Icon className="h-6 w-6 text-muted-foreground" />
       <p className="max-w-[220px] text-sm text-muted-foreground">{text}</p>
     </div>

@@ -6,9 +6,9 @@ import "leaflet/dist/leaflet.css";
 import type { NearbyPlace } from "@/types";
 
 const TYPE_COLORS: Record<string, string> = {
-  doctor: "#2563EB",
-  hospital: "#EF4444",
-  clinic: "#14B8A6",
+  doctor: "#2F6FED",
+  hospital: "#E0393F",
+  clinic: "#0EA88B",
   pharmacy: "#F59E0B",
 };
 
@@ -21,7 +21,7 @@ function createIcon(color: string, isUser = false) {
       border-radius: 9999px;
       background: ${color};
       border: 2px solid white;
-      box-shadow: 0 0 0 4px ${color}33;
+      box-shadow: 0 0 0 4px ${color}33, 0 2px 8px rgba(0,0,0,0.15);
     "></div>`,
     iconSize: [isUser ? 18 : 14, isUser ? 18 : 14],
     iconAnchor: [isUser ? 9 : 7, isUser ? 9 : 7],
@@ -48,8 +48,8 @@ export function DoctorsMap({ userLat, userLng, places, selectedId }: DoctorsMapP
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <Circle center={[userLat, userLng]} radius={300} pathOptions={{ color: "#2563EB", fillOpacity: 0.08 }} />
-      <Marker position={[userLat, userLng]} icon={createIcon("#2563EB", true)}>
+      <Circle center={[userLat, userLng]} radius={300} pathOptions={{ color: "#2F6FED", fillOpacity: 0.1 }} />
+      <Marker position={[userLat, userLng]} icon={createIcon("#2F6FED", true)}>
         <Popup>You are here</Popup>
       </Marker>
 
@@ -57,7 +57,7 @@ export function DoctorsMap({ userLat, userLng, places, selectedId }: DoctorsMapP
         <Marker
           key={place.id}
           position={[place.latitude, place.longitude]}
-          icon={createIcon(TYPE_COLORS[place.type] ?? "#94A3B8")}
+          icon={createIcon(TYPE_COLORS[place.type] ?? "#5B6577")}
         >
           <Popup>
             <div className="text-sm">

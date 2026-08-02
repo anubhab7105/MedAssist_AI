@@ -2,14 +2,14 @@
 
 export default function DoctorsNearMePage() {
   return (
-    <div className="relative min-h-[70vh] overflow-hidden rounded-2xl border border-white/10 bg-background/70 p-6 sm:p-8">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),transparent_60%)] blur-3xl" />
-      <div className="pointer-events-none flex min-h-[60vh] select-none items-center justify-center rounded-2xl border border-white/10 bg-black/10 p-6 backdrop-blur-xl">
+    <div className="relative min-h-[70vh] overflow-hidden rounded-2xl border border-border bg-white p-6 sm:p-8">
+      <div className="absolute inset-0 -z-10 bg-aurora" />
+      <div className="pointer-events-none flex min-h-[60vh] select-none items-center justify-center rounded-2xl border border-dashed border-border bg-white/60 p-6 backdrop-blur-xl">
         <div className="text-center">
-          <p className="text-sm font-medium uppercase tracking-[0.35em] text-muted-foreground">
+          <p className="text-sm font-medium uppercase tracking-[0.35em] text-accent">
             Coming soon
           </p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+          <h2 className="mt-3 font-display text-2xl font-medium tracking-tight text-foreground">
             Doctors Near Me
           </h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">

@@ -30,9 +30,9 @@ export function Sidebar() {
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "MA";
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-white/[0.06] bg-card/40 md:flex">
-      <div className="flex h-16 items-center gap-2 px-6 font-semibold tracking-tight">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-white md:flex">
+      <div className="flex h-16 items-center gap-2 px-6 font-semibold tracking-tight text-foreground">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
           <Activity className="h-4.5 w-4.5 text-white" />
         </span>
         MedAssist AI
@@ -46,10 +46,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
                 active
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                  ? "bg-gradient-to-r from-primary/10 to-secondary/10 text-primary"
+                  : "text-muted-foreground hover:bg-slate-100 hover:text-foreground"
               )}
             >
               <item.icon className="h-4.5 w-4.5" />
@@ -59,18 +59,18 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-white/[0.06] p-4">
+      <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{user?.email ?? "Signed in"}</p>
+            <p className="truncate text-sm font-medium text-foreground">{user?.email ?? "Signed in"}</p>
           </div>
           <button
             onClick={() => signOut()}
             aria-label="Log out"
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-danger"
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
           >
             <LogOut className="h-4 w-4" />
           </button>

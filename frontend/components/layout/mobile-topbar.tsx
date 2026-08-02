@@ -21,22 +21,22 @@ export function MobileTopbar() {
   const { signOut } = useAuth();
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-4 md:hidden">
-      <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+    <div className="flex h-16 items-center justify-between border-b border-border bg-white px-4 md:hidden">
+      <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-foreground">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
           <Activity className="h-4.5 w-4.5 text-white" />
         </span>
         MedAssist AI
       </Link>
-      <button onClick={() => setOpen(true)} aria-label="Open menu" className="p-2">
+      <button onClick={() => setOpen(true)} aria-label="Open menu" className="p-2 text-foreground">
         <Menu className="h-5 w-5" />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl">
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl animate-in fade-in-0">
           <div className="flex h-16 items-center justify-between px-4">
-            <span className="font-semibold">Menu</span>
-            <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-2">
+            <span className="font-semibold text-foreground">Menu</span>
+            <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-2 text-foreground">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -48,7 +48,7 @@ export function MobileTopbar() {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium",
-                  pathname === item.href ? "bg-primary/15 text-primary" : "text-muted-foreground"
+                  pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />

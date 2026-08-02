@@ -18,12 +18,12 @@ const FOOTER_LINKS = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-background">
+    <footer className="border-t border-border bg-white">
       <div className="container py-16">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
                 <Activity className="h-4.5 w-4.5 text-white" />
               </span>
               MedAssist AI
@@ -50,7 +50,7 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-white/[0.06] pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-16 flex flex-col gap-4 border-t border-border pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {new Date().getFullYear()} MedAssist AI. All rights reserved.</p>
           <p className="max-w-xl">
             MedAssist AI is not a substitute for professional medical advice, diagnosis, or

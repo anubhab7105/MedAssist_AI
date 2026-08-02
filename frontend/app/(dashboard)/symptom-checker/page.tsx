@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SymptomForm } from "@/components/symptom-checker/symptom-form";
 import { SymptomResult } from "@/components/symptom-checker/symptom-result";
@@ -27,25 +28,43 @@ export default function SymptomCheckerPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">AI Symptom Checker</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">AI Symptom Checker</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Share what you&apos;re experiencing for a structured, educational summary.
         </p>
       </div>
 
-      {!result && <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />}
-
-      {result && (
-        <div className="space-y-4">
-          <SymptomResult result={result} />
-          <button
-            onClick={() => setResult(null)}
-            className="mx-auto block text-sm text-primary hover:underline"
+      <AnimatePresence mode="wait">
+        {!result && (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
           >
-            Run another check
-          </button>
-        </div>
-      )}
+            <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />
+          </motion.div>
+        )}
+
+        {result && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-4"
+          >
+            <SymptomResult result={result} />
+            <button
+              onClick={() => setResult(null)}
+              className="mx-auto block text-sm font-medium text-primary hover:underline"
+            >
+              Run another check
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

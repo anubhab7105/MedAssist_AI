@@ -84,7 +84,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Profile</h1>
         <p className="mt-1 text-sm text-muted-foreground">Manage your account and view your history.</p>
       </div>
 
@@ -142,12 +142,12 @@ export default function ProfilePage() {
                 <p className="py-6 text-center text-sm text-muted-foreground">No chat history yet.</p>
               )}
               {chatHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-xl border border-white/[0.06] p-3">
+                <div key={entry.id} className="rounded-xl border border-border bg-white p-3">
                   <div className="flex items-center justify-between">
                     <Badge variant={entry.role === "user" ? "outline" : "default"}>{entry.role}</Badge>
                     <span className="text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm">{entry.content}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-foreground">{entry.content}</p>
                 </div>
               ))}
             </TabsContent>
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                 <p className="py-6 text-center text-sm text-muted-foreground">No symptom checks yet.</p>
               )}
               {symptomHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-xl border border-white/[0.06] p-3">
+                <div key={entry.id} className="rounded-xl border border-border bg-white p-3">
                   <div className="flex items-center justify-between">
                     {entry.response_payload?.severity && (
                       <Badge className={severityColor(entry.response_payload.severity)} variant="outline">
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                     )}
                     <span className="text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm">{entry.request_payload?.symptoms}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-foreground">{entry.request_payload?.symptoms}</p>
                 </div>
               ))}
             </TabsContent>

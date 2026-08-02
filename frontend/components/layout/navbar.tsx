@@ -18,13 +18,13 @@ export function Navbar() {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-background/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <nav className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
+        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary shadow-[0_6px_16px_-6px_rgba(47,111,237,0.6)]">
             <Activity className="h-4.5 w-4.5 text-white" />
           </span>
-          MedAssist <span className="text-primary">AI</span>
+          MedAssist <span className="text-gradient">AI</span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -73,7 +73,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden border-t border-white/[0.06] md:hidden"
+            className="overflow-hidden border-t border-border md:hidden"
           >
             <div className="container flex flex-col gap-4 py-4">
               {NAV_LINKS.map((link) => (

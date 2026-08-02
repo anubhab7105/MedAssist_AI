@@ -34,17 +34,17 @@ export function PlaceCard({ place, selected, onSelect, userLat, userLng }: Place
     <button
       onClick={onSelect}
       className={cn(
-        "w-full rounded-xl border p-4 text-left transition-colors",
-        selected ? "border-primary/50 bg-primary/5" : "border-white/[0.06] hover:bg-white/[0.03]"
+        "w-full rounded-xl border bg-white p-4 text-left transition-all",
+        selected ? "border-primary/50 bg-primary/5 shadow-sm" : "border-border hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm"
       )}
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 text-foreground/80">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground/80">
           <Icon className="h-4.5 w-4.5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="truncate font-medium">{place.name}</p>
+            <p className="truncate font-medium text-foreground">{place.name}</p>
             <Badge variant={TYPE_BADGE[place.type]}>{place.type}</Badge>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{place.distanceKm} km away</p>

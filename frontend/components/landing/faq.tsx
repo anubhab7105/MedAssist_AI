@@ -35,10 +35,12 @@ export function FAQ() {
     <section id="faq" className="container py-24">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-secondary">FAQ</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Common questions</h2>
+        <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          Common questions
+        </h2>
       </div>
 
-      <div className="mt-10 max-w-3xl">
+      <div className="mt-10 max-w-3xl rounded-2xl border border-border bg-white px-6">
         <Accordion type="single" collapsible>
           {FAQS.map((faq) => (
             <AccordionItem key={faq.question} value={faq.question}>

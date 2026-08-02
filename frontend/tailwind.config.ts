@@ -19,42 +19,48 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // "Vital Blue" — primary. Confident, clinical-but-warm.
         primary: {
-          DEFAULT: "#2563EB",
-          foreground: "#F8FAFC",
+          DEFAULT: "#2F6FED",
+          foreground: "#FFFFFF",
         },
+        // "Pulse Teal" — secondary. Calm, restorative.
         secondary: {
-          DEFAULT: "#14B8A6",
-          foreground: "#F8FAFC",
+          DEFAULT: "#0EA88B",
+          foreground: "#FFFFFF",
         },
+        // "Bloom Violet" — accent. Used sparingly in gradients.
         accent: {
-          DEFAULT: "#06B6D4",
-          foreground: "#F8FAFC",
+          DEFAULT: "#8B7CF6",
+          foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "#1E293B",
-          foreground: "#F1F5F9",
+          DEFAULT: "#FFFFFF",
+          foreground: "hsl(var(--foreground))",
         },
         danger: {
-          DEFAULT: "#EF4444",
+          DEFAULT: "#E0393F",
           foreground: "#FEF2F2",
         },
         success: {
-          DEFAULT: "#22C55E",
+          DEFAULT: "#16A34A",
           foreground: "#F0FDF4",
         },
         warning: {
           DEFAULT: "#F59E0B",
-          foreground: "#FFFBEB",
+          foreground: "#78350F",
         },
         muted: {
-          DEFAULT: "#334155",
-          foreground: "#94A3B8",
+          DEFAULT: "#EEF2F8",
+          foreground: "#5B6577",
         },
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "monospace"],
+        // Restrained editorial serif — used only for hero/section display
+        // headlines to give the product warmth a pure-sans health app lacks.
+        display: ["ui-serif", "Iowan Old Style", "Palatino Linotype", "Georgia", "serif"],
       },
       borderRadius: {
         xl: "1rem",
@@ -62,13 +68,14 @@ const config: Config = {
         "3xl": "1.75rem",
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(37, 99, 235, 0.35)",
-        "glow-accent": "0 0 40px -10px rgba(6, 182, 212, 0.35)",
-        soft: "0 8px 30px rgba(0, 0, 0, 0.25)",
+        glow: "0 0 40px -10px rgba(47, 111, 237, 0.30)",
+        "glow-accent": "0 0 40px -10px rgba(14, 168, 139, 0.30)",
+        soft: "0 8px 30px -8px rgba(30, 64, 175, 0.12)",
+        popover: "0 20px 50px -12px rgba(20, 40, 80, 0.25)",
       },
       backgroundImage: {
         "grid-pattern":
-          "linear-gradient(to right, rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.06) 1px, transparent 1px)",
+          "linear-gradient(to right, rgba(30,41,59,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(30,41,59,0.05) 1px, transparent 1px)",
       },
       keyframes: {
         "fade-up": {
@@ -83,6 +90,10 @@ const config: Config = {
           "0%": { backgroundPosition: "-1000px 0" },
           "100%": { backgroundPosition: "1000px 0" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -96,6 +107,7 @@ const config: Config = {
         "fade-up": "fade-up 0.6s ease-out forwards",
         "pulse-line": "pulse-line 2.4s linear infinite",
         shimmer: "shimmer 2s infinite linear",
+        float: "float 5s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
