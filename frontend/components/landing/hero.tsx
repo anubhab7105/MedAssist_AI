@@ -56,7 +56,7 @@ export function Hero() {
               <Bot className="h-5 w-5" />
             </span>
             <div>
-              <h2 className="text-sm font-semibold text-foreground">MedCare Assistant</h2>
+              <h2 className="text-sm font-semibold text-foreground">MedAssist AI</h2>
               <p className="flex items-center gap-1.5 text-xs font-medium text-secondary">
                 <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
                 Online
@@ -66,7 +66,7 @@ export function Hero() {
 
           <div className="space-y-4 p-5">
             <div className="max-w-[82%] rounded-lg rounded-tl-sm border border-secondary/10 bg-secondary/5 px-4 py-3 text-sm leading-6 text-foreground">
-              Hello. I&apos;m MedCare AI. How can I assist you with your symptoms today?
+              Hello. I&apos;m MedAssist AI. How can I assist you with your symptoms today?
             </div>
             <p className="text-xs text-muted-foreground">10:42 AM</p>
             <div className="ml-auto max-w-[82%] rounded-lg rounded-tr-sm bg-[#e6eeff] px-4 py-3 text-sm leading-6 text-foreground">
