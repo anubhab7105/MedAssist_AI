@@ -26,9 +26,13 @@ export default function SymptomCheckerPage() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">AI Symptom Checker</h1>
+    <div className="mx-auto max-w-3xl space-y-8">
+      <div className="clinical-panel p-6">
+        <div className="status-pill">
+          <span className="status-dot" />
+          Structured review
+        </div>
+        <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">AI Symptom Checker</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Share what you&apos;re experiencing for a structured, educational summary.
         </p>
@@ -43,7 +47,9 @@ export default function SymptomCheckerPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
           >
-            <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />
+            <div className="clinical-panel p-6">
+              <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />
+            </div>
           </motion.div>
         )}
 

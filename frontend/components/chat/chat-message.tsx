@@ -17,7 +17,7 @@ export function ChatMessageBubble({ message }: { message: ChatMessageType }) {
         transition={{ duration: 0.3 }}
         className="flex justify-start"
       >
-        <div className="flex max-w-[85%] items-start gap-3 rounded-2xl rounded-tl-sm border border-danger/30 bg-danger/5 px-4 py-3">
+        <div className="flex max-w-[85%] items-start gap-3 rounded-lg rounded-tl-sm border border-danger/30 bg-danger/5 px-4 py-3 shadow-soft">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
           <p className="text-sm leading-relaxed text-danger">{message.content}</p>
         </div>
@@ -33,16 +33,16 @@ export function ChatMessageBubble({ message }: { message: ChatMessageType }) {
       className={cn("flex items-start gap-3", isUser ? "justify-end" : "justify-start")}
     >
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary shadow-sm">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary shadow-sm">
           <Bot className="h-4 w-4 text-white" />
         </div>
       )}
       <div
         className={cn(
-          "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+          "max-w-[85%] rounded-lg px-4 py-3 text-sm leading-relaxed shadow-sm",
           isUser
-            ? "rounded-tr-sm bg-gradient-to-br from-primary to-primary/90 text-primary-foreground"
-            : "rounded-tl-sm border border-border bg-white text-foreground"
+            ? "rounded-tr-sm bg-[#e6eeff] text-foreground"
+            : "rounded-tl-sm border border-secondary/10 bg-secondary/5 text-foreground"
         )}
       >
         {isUser ? (
@@ -56,7 +56,7 @@ export function ChatMessageBubble({ message }: { message: ChatMessageType }) {
         )}
       </div>
       {isUser && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#dce9ff]">
           <UserIcon className="h-4 w-4 text-foreground/70" />
         </div>
       )}

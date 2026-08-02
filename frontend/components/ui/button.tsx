@@ -4,18 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-primary to-primary bg-[length:140%_100%] bg-left text-primary-foreground shadow-[0_10px_24px_-10px_rgba(47,111,237,0.55)] hover:bg-right hover:shadow-[0_14px_28px_-10px_rgba(47,111,237,0.65)] active:scale-[0.98]",
+          "bg-primary text-primary-foreground shadow-[0_2px_4px_rgba(13,28,46,0.12)] hover:bg-[#00429c] hover:shadow-[0_8px_18px_-12px_rgba(0,49,120,0.65)] active:translate-y-px",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-[0_10px_24px_-10px_rgba(14,168,139,0.5)] hover:bg-secondary/90 active:scale-[0.98]",
+          "bg-secondary text-secondary-foreground shadow-[0_2px_4px_rgba(13,28,46,0.10)] hover:bg-[#005049] active:translate-y-px",
         outline:
-          "border border-border bg-white text-foreground hover:border-primary/40 hover:bg-primary/5 active:scale-[0.98]",
-        ghost: "text-foreground hover:bg-slate-100 active:scale-[0.98]",
-        danger: "bg-danger text-danger-foreground hover:bg-danger/90 active:scale-[0.98]",
+          "border border-secondary bg-white/70 text-secondary hover:bg-secondary/5 active:translate-y-px",
+        ghost: "text-foreground hover:bg-[#eff4ff] active:translate-y-px",
+        danger: "bg-danger text-danger-foreground hover:bg-danger/90 active:translate-y-px",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

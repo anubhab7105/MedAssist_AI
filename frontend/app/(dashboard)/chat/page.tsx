@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
 import { useChat } from "@/hooks/useChat";
 import { ChatMessageBubble } from "@/components/chat/chat-message";
@@ -21,18 +22,27 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col md:h-[calc(100vh-4rem)]">
-      <div className="mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">AI Chat</h1>
+    <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-4xl flex-col md:h-[calc(100vh-5rem)]">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="mb-4"
+      >
+        <div className="status-pill">
+          <span className="status-dot" />
+          Assistant online
+        </div>
+        <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">AI Chat</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Educational guidance only — always consult a licensed doctor for medical decisions.
+          Educational guidance only. Always consult a licensed doctor for medical decisions.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="flex-1 overflow-y-auto rounded-2xl border border-border bg-gradient-to-b from-primary/[0.03] to-transparent p-4 sm:p-6">
+      <div className="clinical-panel flex-1 overflow-y-auto p-4 sm:p-6">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/15 text-primary">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#dce9ff] text-primary">
               <MessageSquare className="h-6 w-6" />
             </div>
             <div>
@@ -42,13 +52,13 @@ export default function ChatPage() {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
-              {SUGGESTIONS.map((s) => (
+              {SUGGESTIONS.map((suggestion) => (
                 <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="rounded-full border border-border bg-white px-3 py-1.5 text-xs text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground hover:shadow-sm"
+                  key={suggestion}
+                  onClick={() => sendMessage(suggestion)}
+                  className="rounded-full border border-[#c3c6d4] bg-[#eff4ff] px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary hover:shadow-sm"
                 >
-                  {s}
+                  {suggestion}
                 </button>
               ))}
             </div>

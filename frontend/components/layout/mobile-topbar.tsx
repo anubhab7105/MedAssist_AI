@@ -21,9 +21,9 @@ export function MobileTopbar() {
   const { signOut } = useAuth();
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-border bg-white px-4 md:hidden">
-      <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-foreground">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
+    <div className="flex h-16 items-center justify-between border-b border-[#c3c6d4] bg-white/90 px-4 backdrop-blur-xl md:hidden">
+      <Link href="/" className="flex items-center gap-2 font-display font-bold text-primary">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
           <Activity className="h-4.5 w-4.5 text-white" />
         </span>
         MedAssist AI
@@ -33,9 +33,9 @@ export function MobileTopbar() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl animate-in fade-in-0">
-          <div className="flex h-16 items-center justify-between px-4">
-            <span className="font-semibold text-foreground">Menu</span>
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl animate-in fade-in-0 zoom-in-95 duration-200">
+          <div className="flex h-16 items-center justify-between border-b border-[#c3c6d4] px-4">
+            <span className="font-display font-semibold text-foreground">Menu</span>
             <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-2 text-foreground">
               <X className="h-5 w-5" />
             </button>
@@ -47,8 +47,8 @@ export function MobileTopbar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium",
-                  pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                  "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium",
+                  pathname === item.href ? "bg-[#dce9ff] text-primary" : "text-muted-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -57,7 +57,7 @@ export function MobileTopbar() {
             ))}
             <button
               onClick={() => signOut()}
-              className="mt-4 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-danger"
+              className="mt-4 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-danger"
             >
               <LogOut className="h-5 w-5" />
               Log out

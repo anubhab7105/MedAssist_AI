@@ -83,8 +83,12 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Profile</h1>
+      <div className="clinical-panel p-6">
+        <div className="status-pill">
+          <span className="status-dot" />
+          Account center
+        </div>
+        <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">Profile</h1>
         <p className="mt-1 text-sm text-muted-foreground">Manage your account and view your history.</p>
       </div>
 
@@ -142,7 +146,7 @@ export default function ProfilePage() {
                 <p className="py-6 text-center text-sm text-muted-foreground">No chat history yet.</p>
               )}
               {chatHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-xl border border-border bg-white p-3">
+                <div key={entry.id} className="rounded-lg border border-border bg-white p-3">
                   <div className="flex items-center justify-between">
                     <Badge variant={entry.role === "user" ? "outline" : "default"}>{entry.role}</Badge>
                     <span className="text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</span>
@@ -158,7 +162,7 @@ export default function ProfilePage() {
                 <p className="py-6 text-center text-sm text-muted-foreground">No symptom checks yet.</p>
               )}
               {symptomHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-xl border border-border bg-white p-3">
+                <div key={entry.id} className="rounded-lg border border-border bg-white p-3">
                   <div className="flex items-center justify-between">
                     {entry.response_payload?.severity && (
                       <Badge className={severityColor(entry.response_payload.severity)} variant="outline">

@@ -18,12 +18,12 @@ const FOOTER_LINKS = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-white">
+    <footer className="border-t border-[#c3c6d4] bg-[#e6eeff]">
       <div className="container py-16">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
+            <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <Activity className="h-4.5 w-4.5 text-white" />
               </span>
               MedAssist AI

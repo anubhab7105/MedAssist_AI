@@ -21,17 +21,17 @@ const config: Config = {
         foreground: "hsl(var(--foreground))",
         // "Vital Blue" — primary. Confident, clinical-but-warm.
         primary: {
-          DEFAULT: "#2F6FED",
+          DEFAULT: "#003178",
           foreground: "#FFFFFF",
         },
         // "Pulse Teal" — secondary. Calm, restorative.
         secondary: {
-          DEFAULT: "#0EA88B",
+          DEFAULT: "#006A62",
           foreground: "#FFFFFF",
         },
         // "Bloom Violet" — accent. Used sparingly in gradients.
         accent: {
-          DEFAULT: "#8B7CF6",
+          DEFAULT: "#2B5BB5",
           foreground: "#FFFFFF",
         },
         card: {
@@ -51,8 +51,8 @@ const config: Config = {
           foreground: "#78350F",
         },
         muted: {
-          DEFAULT: "#EEF2F8",
-          foreground: "#5B6577",
+          DEFAULT: "#E6EEFF",
+          foreground: "#434652",
         },
       },
       fontFamily: {
@@ -60,18 +60,18 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "monospace"],
         // Restrained editorial serif — used only for hero/section display
         // headlines to give the product warmth a pure-sans health app lacks.
-        display: ["ui-serif", "Iowan Old Style", "Palatino Linotype", "Georgia", "serif"],
+        display: ["Public Sans", "var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"],
       },
       borderRadius: {
-        xl: "1rem",
-        "2xl": "1.25rem",
-        "3xl": "1.75rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.25rem",
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(47, 111, 237, 0.30)",
-        "glow-accent": "0 0 40px -10px rgba(14, 168, 139, 0.30)",
-        soft: "0 8px 30px -8px rgba(30, 64, 175, 0.12)",
-        popover: "0 20px 50px -12px rgba(20, 40, 80, 0.25)",
+        glow: "0 0 30px -14px rgba(0, 49, 120, 0.35)",
+        "glow-accent": "0 0 30px -14px rgba(0, 106, 98, 0.30)",
+        soft: "0 4px 20px rgba(13, 28, 46, 0.05)",
+        popover: "0 20px 50px -24px rgba(35, 49, 68, 0.30)",
       },
       backgroundImage: {
         "grid-pattern":
@@ -79,7 +79,7 @@ const config: Config = {
       },
       keyframes: {
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-line": {
@@ -92,7 +92,7 @@ const config: Config = {
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-8px)" },
+          "50%": { transform: "translateY(-5px)" },
         },
         "accordion-down": {
           from: { height: "0" },
@@ -104,10 +104,10 @@ const config: Config = {
         },
       },
       animation: {
-        "fade-up": "fade-up 0.6s ease-out forwards",
+        "fade-up": "fade-up 0.45s ease-out forwards",
         "pulse-line": "pulse-line 2.4s linear infinite",
         shimmer: "shimmer 2s infinite linear",
-        float: "float 5s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

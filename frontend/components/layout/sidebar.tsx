@@ -30,15 +30,15 @@ export function Sidebar() {
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "MA";
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-white md:flex">
-      <div className="flex h-16 items-center gap-2 px-6 font-semibold tracking-tight text-foreground">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-[#c3c6d4] bg-white/85 backdrop-blur-xl md:flex">
+      <Link href="/" className="flex h-[72px] items-center gap-2 px-6 font-display text-lg font-bold text-primary">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-[0_6px_16px_-10px_rgba(0,49,120,0.75)]">
           <Activity className="h-4.5 w-4.5 text-white" />
         </span>
         MedAssist AI
-      </div>
+      </Link>
 
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 px-3 py-5">
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
           return (
@@ -46,10 +46,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                 active
-                  ? "bg-gradient-to-r from-primary/10 to-secondary/10 text-primary"
-                  : "text-muted-foreground hover:bg-slate-100 hover:text-foreground"
+                  ? "bg-[#dce9ff] text-primary shadow-sm"
+                  : "text-muted-foreground hover:bg-[#eff4ff] hover:text-primary"
               )}
             >
               <item.icon className="h-4.5 w-4.5" />
@@ -59,7 +59,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t border-border p-4">
+      <div className="border-t border-[#c3c6d4] p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
             <AvatarFallback>{initials}</AvatarFallback>

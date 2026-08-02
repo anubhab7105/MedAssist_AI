@@ -28,7 +28,7 @@ export function Pricing() {
     <section id="pricing" className="container py-24">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-accent">Pricing</p>
-        <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        <h2 className="mt-3 font-display text-3xl font-semibold text-foreground sm:text-4xl">
           Start free, upgrade later
         </h2>
         <p className="mt-4 text-muted-foreground">Plus-tier pricing is still being finalized.</p>
@@ -44,7 +44,7 @@ export function Pricing() {
             )}
           >
             {tier.highlighted && (
-              <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent" />
+              <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary" />
             )}
             <CardHeader>
               <p className="text-sm text-muted-foreground">{tier.name}</p>

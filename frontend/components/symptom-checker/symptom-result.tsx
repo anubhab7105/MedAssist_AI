@@ -99,7 +99,7 @@ export function SymptomResult({ result }: { result: SymptomCheckResponse }) {
       </div>
 
       {result.recommendedSpecialist && (
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <Card className="border-primary/20 bg-[#eff4ff]">
           <CardContent className="flex items-center justify-between p-5">
             <div>
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Recommended specialist</p>

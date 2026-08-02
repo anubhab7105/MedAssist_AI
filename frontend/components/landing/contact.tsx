@@ -27,7 +27,7 @@ export function Contact() {
       <div className="container grid gap-12 lg:grid-cols-2 lg:items-start">
         <div>
           <p className="text-sm font-medium text-primary">Get in touch</p>
-          <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+          <h2 className="mt-3 font-display text-3xl font-semibold text-foreground sm:text-4xl">
             Questions or feedback?
           </h2>
           <p className="mt-4 max-w-md text-muted-foreground">

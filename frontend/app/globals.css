@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --background: 210 45% 98%;     /* #F6F9FC — soft paper */
-    --foreground: 222 39% 15%;     /* #18233A — ink navy */
-    --border: 220 24% 90%;         /* #DEE4EE */
-    --input: 220 22% 89%;
-    --ring: 221 83% 58%;           /* matches primary */
+    --background: 230 100% 99%;
+    --foreground: 213 56% 12%;
+    --border: 229 18% 80%;
+    --input: 229 32% 88%;
+    --ring: 216 100% 24%;
   }
 
   * {
@@ -29,7 +29,6 @@
     @apply bg-primary/20 text-foreground;
   }
 
-  /* Visible keyboard focus everywhere — never suppressed */
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
@@ -38,45 +37,56 @@
     width: 10px;
     height: 10px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    @apply rounded-full bg-slate-300;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-slate-400;
   }
 }
 
 @layer utilities {
-  /* Light "frosted glass" surface used for floating panels */
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_-12px_rgba(30,64,175,0.18)];
+    @apply border border-[#ccdbf3] bg-white/70 shadow-soft backdrop-blur-xl;
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+    @apply text-primary;
   }
 
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(30, 41, 59, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(30, 41, 59, 0.05) 1px, transparent 1px);
+      linear-gradient(to right, rgba(30, 41, 59, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.04) 1px, transparent 1px);
     background-size: 44px 44px;
   }
 
-  /* Signature background wash — soft multi-hue gradient bloom.
-     Reused across hero, CTA, auth, and empty states to tie the product together. */
   .bg-aurora {
     background-image:
-      radial-gradient(ellipse 60% 50% at 12% -10%, rgba(47, 111, 237, 0.16), transparent 60%),
-      radial-gradient(ellipse 55% 45% at 88% 0%, rgba(14, 168, 139, 0.14), transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 100%, rgba(139, 124, 246, 0.12), transparent 60%);
+      radial-gradient(ellipse 54% 42% at 12% -10%, rgba(13, 71, 161, 0.10), transparent 60%),
+      radial-gradient(ellipse 46% 38% at 90% 0%, rgba(129, 243, 229, 0.18), transparent 62%);
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(30,64,175,0.22)];
+    @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_-22px_rgba(35,49,68,0.34)];
+  }
+
+  .clinical-panel {
+    @apply rounded-2xl border border-[#c3c6d4] bg-white/80 shadow-soft backdrop-blur-xl;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-[#dce9ff] px-3 py-1 text-xs font-semibold text-primary;
+  }
+
+  .status-dot {
+    @apply h-2 w-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,106,98,0.55)];
   }
 }
 
@@ -86,28 +96,29 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-/* Leaflet light-theme tweaks — keep the natural light OSM tiles,
-   just soften the chrome to match the product's rounded, airy UI. */
 .leaflet-container {
-  background: #eef2f8 !important;
+  background: #e6eeff !important;
   font-family: inherit !important;
 }
+
 .leaflet-popup-content-wrapper {
   background: #ffffff !important;
-  color: #18233a !important;
   border-radius: 14px !important;
-  box-shadow: 0 12px 32px -12px rgba(30, 64, 175, 0.28) !important;
+  box-shadow: 0 12px 32px -12px rgba(35, 49, 68, 0.22) !important;
+  color: #0d1c2e !important;
 }
+
 .leaflet-popup-tip {
   background: #ffffff !important;
 }
+
 .leaflet-control-zoom a {
   background: #ffffff !important;
-  color: #18233a !important;
-  border-color: #dee4ee !important;
+  border-color: #c3c6d4 !important;
+  color: #0d1c2e !important;
 }

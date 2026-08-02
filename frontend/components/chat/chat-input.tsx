@@ -38,7 +38,7 @@ export function ChatInput({ onSend, isStreaming, onStop }: ChatInputProps) {
   }
 
   return (
-    <div className="flex items-end gap-2 rounded-2xl border border-border bg-white p-2 shadow-soft transition-shadow focus-within:shadow-[0_0_0_3px_rgba(47,111,237,0.12)]">
+    <div className="flex items-end gap-2 rounded-lg border border-input bg-white p-2 shadow-soft transition-shadow focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(0,49,120,0.10)]">
       <textarea
         ref={textareaRef}
         rows={1}

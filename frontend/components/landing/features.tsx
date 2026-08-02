@@ -56,7 +56,7 @@ export function Features() {
     <section id="features" className="container py-24">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-accent">Everything in one place</p>
-        <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        <h2 className="mt-3 font-display text-3xl font-semibold text-foreground sm:text-4xl">
           Built for clarity, not diagnosis
         </h2>
         <p className="mt-4 text-muted-foreground">
@@ -72,9 +72,9 @@ export function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, delay: i * 0.05 }}
-            className={`card-hover group rounded-2xl border border-border bg-gradient-to-b ${feature.tint} bg-white p-6 ${feature.span}`}
+            className={`card-hover group rounded-2xl border border-border bg-white p-6 ${feature.span}`}
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-border transition-transform group-hover:scale-110">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#eff4ff] text-primary shadow-sm ring-1 ring-border transition-transform group-hover:scale-105">
               <feature.icon className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-lg font-medium text-foreground">{feature.title}</h3>

@@ -32,7 +32,7 @@ export function Screenshots() {
     <section className="container py-24">
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-primary">Inside the product</p>
-        <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        <h2 className="mt-3 font-display text-3xl font-semibold text-foreground sm:text-4xl">
           A look at the workspace
         </h2>
       </div>
@@ -47,7 +47,7 @@ export function Screenshots() {
             transition={{ duration: 0.5, delay: i * 0.08 }}
             className="card-hover overflow-hidden rounded-2xl border border-border bg-white"
           >
-            <div className={`flex aspect-[4/3] items-center justify-center bg-gradient-to-br ${preview.gradient}`}>
+            <div className="flex aspect-[4/3] items-center justify-center bg-[#eff4ff]">
               <preview.icon className={`h-10 w-10 ${preview.iconColor}`} />
             </div>
             <div className="p-5">
