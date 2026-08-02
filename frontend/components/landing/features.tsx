@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageSquare, Stethoscope, MapPin, ShieldAlert, History, Compass } from "lucide-react";
+import { MessageSquare, Stethoscope, MapPin, ShieldAlert, History, Compass, Gift } from "lucide-react";
 
 const FEATURES = [
   {
@@ -48,6 +48,13 @@ const FEATURES = [
     description: "Every chat and symptom check is saved so you can track patterns and revisit past guidance.",
     span: "",
     tint: "from-secondary/10 to-secondary/0 text-secondary",
+  },
+  {
+    icon: Gift,
+    title: "Free to Use",
+    description: "No subscriptions, no hidden fees — every feature is completely free for everyone.",
+    span: "",
+    tint: "from-accent/10 to-accent/0 text-accent",
   },
 ];
 
