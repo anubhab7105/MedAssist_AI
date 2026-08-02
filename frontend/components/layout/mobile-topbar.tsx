@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Activity, Menu, X, LayoutDashboard, MessageSquare, Stethoscope, MapPin, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { LogoutDialog } from "@/components/layout/logout-dialog";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,7 +19,6 @@ const NAV_ITEMS = [
 export function MobileTopbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { signOut } = useAuth();
 
   return (
     <div className="flex h-16 items-center justify-between border-b border-[#c3c6d4] bg-white/90 px-4 backdrop-blur-xl md:hidden">
@@ -55,16 +55,18 @@ export function MobileTopbar() {
                 {item.label}
               </Link>
             ))}
-            <button
-              onClick={() => signOut()}
-              className="mt-4 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-danger"
-            >
-              <LogOut className="h-5 w-5" />
-              Log out
-            </button>
+            <LogoutDialog
+              trigger={
+                <button className="mt-4 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-danger">
+                  <LogOut className="h-5 w-5" />
+                  Log out
+                </button>
+              }
+            />
           </nav>
         </div>
       )}
     </div>
   );
 }
+

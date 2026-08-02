@@ -23,6 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { LogoutDialog } from "@/components/layout/logout-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { getProfile, updateProfile, getChatHistory, getSymptomHistory, deleteAccount } from "@/services/profile";
 import { formatRelativeTime, severityColor } from "@/lib/utils";
@@ -185,9 +186,13 @@ export default function ProfilePage() {
           <CardDescription>These actions are permanent and cannot be undone.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row">
-          <Button variant="outline" onClick={() => signOut()} className="sm:w-auto">
-            <LogOut className="h-4 w-4" /> Log out
-          </Button>
+          <LogoutDialog
+            trigger={
+              <Button variant="outline" className="sm:w-auto">
+                <LogOut className="h-4 w-4" /> Log out
+              </Button>
+            }
+          />
 
           <Dialog>
             <DialogTrigger asChild>

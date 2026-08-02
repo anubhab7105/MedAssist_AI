@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogoutDialog } from "@/components/layout/logout-dialog";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -25,7 +26,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "MA";
 
@@ -67,15 +68,19 @@ export function Sidebar() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-foreground">{user?.email ?? "Signed in"}</p>
           </div>
-          <button
-            onClick={() => signOut()}
-            aria-label="Log out"
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+          <LogoutDialog
+            trigger={
+              <button
+                aria-label="Log out"
+                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            }
+          />
         </div>
       </div>
     </aside>
   );
 }
+
