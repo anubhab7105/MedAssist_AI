@@ -114,6 +114,15 @@ class NearbyPlacesRequest(BaseModel):
     longitude: float = Field(..., ge=-180, le=180)
     radius_meters: int = Field(5000, ge=500, le=20000)
     place_type: Optional[PlaceType] = None
+    search: Optional[str] = Field(None, max_length=100)
+
+    @field_validator("search")
+    @classmethod
+    def strip_search(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        v = v.strip()
+        return v or None
 
 
 class NearbyPlacesResponse(BaseModel):

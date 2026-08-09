@@ -17,7 +17,11 @@ async def nearby(
 ):
     try:
         places = await find_nearby_places(
-            payload.latitude, payload.longitude, payload.radius_meters, payload.place_type
+            payload.latitude,
+            payload.longitude,
+            payload.radius_meters,
+            payload.place_type,
+            payload.search,
         )
     except Exception as exc:  # Overpass occasionally times out / rate-limits
         raise HTTPException(
