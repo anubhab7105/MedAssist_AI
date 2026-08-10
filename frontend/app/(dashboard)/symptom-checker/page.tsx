@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Clock, ClipboardList, RotateCcw, Trash2 } from "lucide-react";
+import {
+  Clock,
+  ClipboardList,
+  PanelLeftClose,
+  PanelLeftOpen,
+  RotateCcw,
+  Trash2,
+} from "lucide-react";
 import { SymptomForm } from "@/components/symptom-checker/symptom-form";
 import { SymptomResult } from "@/components/symptom-checker/symptom-result";
 import { checkSymptoms } from "@/services/symptomChecker";
@@ -31,6 +38,7 @@ export default function SymptomCheckerPage() {
 
   const [view, setView] = useState<ViewState>({ kind: "form" });
   const [history, setHistory] = useState<LocalSymptomRecord[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const userId = user?.id ?? "";
 
@@ -71,166 +79,242 @@ export default function SymptomCheckerPage() {
     }
   };
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      <div className="clinical-panel p-6">
-        <div className="status-pill">
-          <span className="status-dot" />
-          Structured review
-        </div>
-        <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">AI Symptom Checker</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Share what you&apos;re experiencing for a structured, educational summary.
-        </p>
-      </div>
+  const handleNewCheck = () => {
+    setView({ kind: "form" });
+  };
 
+  return (
+    <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-6xl gap-0 md:h-[calc(100vh-5rem)]">
       {/* ----------------------------------------------------------------- */}
-      {/* Previous checks (compact inline list)                             */}
+      {/* Sidebar – Previous checks                                         */}
       {/* ----------------------------------------------------------------- */}
-      {history.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="clinical-panel p-4"
-        >
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <ClipboardList className="h-4 w-4 text-primary" />
-              Previous checks
-            </h2>
-            {view.kind !== "form" && (
-              <button
-                onClick={() => setView({ kind: "form" })}
-                className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
-              >
-                <RotateCcw className="h-3 w-3" />
-                New check
-              </button>
-            )}
-          </div>
-          <div className="space-y-1.5">
-            {history.map((record) => (
-              <button
-                key={record.id}
-                onClick={() => setView({ kind: "history-detail", record })}
-                className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                  view.kind === "history-detail" && view.record.id === record.id
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/80 hover:bg-muted/15"
-                }`}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium leading-snug">{record.title}</p>
-                  <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    {formatRelativeTime(record.createdAt)}
-                  </p>
-                </div>
-                {record.result.severity && (
-                  <Badge className={severityColor(record.result.severity)} variant="outline">
-                    {record.result.severity}
-                  </Badge>
-                )}
+      <AnimatePresence initial={false}>
+        {sidebarOpen && (
+          <motion.aside
+            key="symptom-sidebar"
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 280, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="hidden flex-shrink-0 flex-col overflow-hidden border-r border-border md:flex"
+          >
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Previous Checks
+              </span>
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={(e) => handleDeleteRecord(record.id, e)}
-                  className="rounded p-1 opacity-0 transition-opacity hover:text-danger group-hover:opacity-100"
-                  title="Delete"
+                  onClick={handleNewCheck}
+                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/20 hover:text-primary"
+                  title="New check"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <RotateCcw className="h-4 w-4" />
                 </button>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      )}
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/20 hover:text-primary"
+                  title="Close sidebar"
+                >
+                  <PanelLeftClose className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-2 py-2">
+              {history.length === 0 && (
+                <p className="px-2 py-6 text-center text-xs text-muted-foreground">
+                  No previous checks yet.
+                </p>
+              )}
+              {history.map((record) => (
+                <button
+                  key={record.id}
+                  onClick={() => setView({ kind: "history-detail", record })}
+                  className={`group mb-1 flex w-full items-start gap-2 rounded-lg px-3 py-2.5 text-left transition-colors ${
+                    view.kind === "history-detail" && view.record.id === record.id
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground/80 hover:bg-muted/15"
+                  }`}
+                >
+                  <ClipboardList className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 opacity-50" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium leading-snug">{record.title}</p>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {formatRelativeTime(record.createdAt)}
+                      </span>
+                      {record.result.severity && (
+                        <Badge
+                          className={`${severityColor(record.result.severity)} scale-90`}
+                          variant="outline"
+                        >
+                          {record.result.severity}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => handleDeleteRecord(record.id, e)}
+                    className="ml-auto rounded p-1 opacity-0 transition-opacity hover:text-danger group-hover:opacity-100"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </button>
+              ))}
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
       {/* ----------------------------------------------------------------- */}
       {/* Main content area                                                 */}
       {/* ----------------------------------------------------------------- */}
-      <AnimatePresence mode="wait">
-        {view.kind === "form" && (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-          >
-            <div className="clinical-panel p-6">
-              <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="mb-4 flex items-start justify-between"
+        >
+          <div>
+            {!sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="mb-2 hidden rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/20 hover:text-primary md:inline-flex"
+                title="Open sidebar"
+              >
+                <PanelLeftOpen className="h-4 w-4" />
+              </button>
+            )}
+            <div className="status-pill">
+              <span className="status-dot" />
+              Structured review
             </div>
-          </motion.div>
-        )}
+            <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">
+              AI Symptom Checker
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Share what you&apos;re experiencing for a structured, educational summary.
+            </p>
+          </div>
 
-        {view.kind === "result" && (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-4"
-          >
-            <SymptomResult result={view.result} />
+          {/* Mobile new check button */}
+          <div className="flex gap-1 md:hidden">
             <button
-              onClick={() => setView({ kind: "form" })}
-              className="mx-auto block text-sm font-medium text-primary hover:underline"
+              onClick={handleNewCheck}
+              className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted/20 hover:text-primary"
+              title="New check"
             >
-              Run another check
+              <RotateCcw className="h-5 w-5" />
             </button>
-          </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Mobile history strip */}
+        {history.length > 0 && (
+          <div className="mb-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
+            {history.slice(0, 5).map((record) => (
+              <button
+                key={record.id}
+                onClick={() => setView({ kind: "history-detail", record })}
+                className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  view.kind === "history-detail" && view.record.id === record.id
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-white text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {record.title.length > 25 ? record.title.slice(0, 25) + "…" : record.title}
+              </button>
+            ))}
+          </div>
         )}
 
-        {view.kind === "history-detail" && (
-          <motion.div
-            key={`detail-${view.record.id}`}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="space-y-4"
-          >
-            {/* Submitted form data summary */}
-            <div className="clinical-panel space-y-3 p-6">
-              <h3 className="text-sm font-semibold text-foreground">Submitted details</h3>
-              <div className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-                <Detail label="Symptoms" value={view.record.formData.symptoms} />
-                <Detail label="Duration" value={view.record.formData.duration} />
-                <Detail label="Age" value={String(view.record.formData.age)} />
-                <Detail label="Gender" value={view.record.formData.gender} />
-                <Detail label="Pain level" value={`${view.record.formData.painLevel} / 10`} />
-                {view.record.formData.weightKg && (
-                  <Detail label="Weight" value={`${view.record.formData.weightKg} kg`} />
-                )}
-                {view.record.formData.heightCm && (
-                  <Detail label="Height" value={`${view.record.formData.heightCm} cm`} />
-                )}
-                {view.record.formData.temperatureCelsius && (
-                  <Detail label="Temperature" value={`${view.record.formData.temperatureCelsius} °C`} />
-                )}
-                {view.record.formData.currentMedication && (
-                  <Detail label="Medication" value={view.record.formData.currentMedication} />
-                )}
-                {view.record.formData.knownDiseases && (
-                  <Detail label="Known conditions" value={view.record.formData.knownDiseases} />
-                )}
-                {view.record.formData.allergies && (
-                  <Detail label="Allergies" value={view.record.formData.allergies} />
-                )}
+        <AnimatePresence mode="wait">
+          {view.kind === "form" && (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="clinical-panel p-6">
+                <SymptomForm onSubmit={(values) => mutation.mutate(values)} loading={mutation.isPending} />
               </div>
-            </div>
+            </motion.div>
+          )}
 
-            {/* Reuse the SymptomResult component */}
-            <SymptomResult result={view.record.result} />
-
-            <button
-              onClick={() => setView({ kind: "form" })}
-              className="mx-auto block text-sm font-medium text-primary hover:underline"
+          {view.kind === "result" && (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
             >
-              Run another check
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <SymptomResult result={view.result} />
+              <button
+                onClick={handleNewCheck}
+                className="mx-auto block text-sm font-medium text-primary hover:underline"
+              >
+                Run another check
+              </button>
+            </motion.div>
+          )}
+
+          {view.kind === "history-detail" && (
+            <motion.div
+              key={`detail-${view.record.id}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
+              {/* Submitted form data summary */}
+              <div className="clinical-panel space-y-3 p-6">
+                <h3 className="text-sm font-semibold text-foreground">Submitted details</h3>
+                <div className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                  <Detail label="Symptoms" value={view.record.formData.symptoms} />
+                  <Detail label="Duration" value={view.record.formData.duration} />
+                  <Detail label="Age" value={String(view.record.formData.age)} />
+                  <Detail label="Gender" value={view.record.formData.gender} />
+                  <Detail label="Pain level" value={`${view.record.formData.painLevel} / 10`} />
+                  {view.record.formData.weightKg && (
+                    <Detail label="Weight" value={`${view.record.formData.weightKg} kg`} />
+                  )}
+                  {view.record.formData.heightCm && (
+                    <Detail label="Height" value={`${view.record.formData.heightCm} cm`} />
+                  )}
+                  {view.record.formData.temperatureCelsius && (
+                    <Detail label="Temperature" value={`${view.record.formData.temperatureCelsius} °C`} />
+                  )}
+                  {view.record.formData.currentMedication && (
+                    <Detail label="Medication" value={view.record.formData.currentMedication} />
+                  )}
+                  {view.record.formData.knownDiseases && (
+                    <Detail label="Known conditions" value={view.record.formData.knownDiseases} />
+                  )}
+                  {view.record.formData.allergies && (
+                    <Detail label="Allergies" value={view.record.formData.allergies} />
+                  )}
+                </div>
+              </div>
+
+              {/* Reuse the SymptomResult component */}
+              <SymptomResult result={view.record.result} />
+
+              <button
+                onClick={handleNewCheck}
+                className="mx-auto block text-sm font-medium text-primary hover:underline"
+              >
+                Run another check
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
