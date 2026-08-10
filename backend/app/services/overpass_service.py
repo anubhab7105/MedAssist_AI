@@ -134,8 +134,8 @@ out center tags;
 
 
 def _classify(tags: dict) -> PlaceType | None:
-    amenity = tags.get("amenity")
-    healthcare = tags.get("healthcare")
+    amenity = (tags.get("amenity") or "").strip()
+    healthcare = (tags.get("healthcare") or "").strip()
     if amenity == "pharmacy" or healthcare == "pharmacy":
         return PlaceType.pharmacy
     if amenity == "hospital" or healthcare == "hospital":
@@ -150,32 +150,24 @@ def _classify(tags: dict) -> PlaceType | None:
     return None
 
 
-async def find_nearby_places(
-    lat: float, lng: float, radius_m: int, place_type: PlaceType | None, search: str | None = None
-) -> list[NearbyPlace]:
-    query = _build_query(lat, lng, radius_m, place_type, search)
-
-    data = None
+async def _query_overpass(query: str) -> dict:
+    """POST a query to the first Overpass provider that answers it."""
     errors: list[str] = []
-    timeout = httpx.Timeout(12.0, connect=5.0)
+    timeout = httpx.Timeout(20.0, connect=5.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
         for url in dict.fromkeys(_OVERPASS_URLS):
             for attempt in range(2):
                 try:
                     response = await client.post(url, data={"data": query})
                     response.raise_for_status()
-                    data = response.json()
-                    break
+                    return response.json()
                 except httpx.HTTPError as exc:
                     errors.append(f"{url} (attempt {attempt + 1}): {exc}")
                     await asyncio.sleep(1.5)
-            if data is not None:
-                break
+    raise httpx.HTTPError(f"All Overpass providers failed: {' | '.join(errors)}")
 
-    if data is None:
-        logger.warning("All Overpass providers failed: %s", " | ".join(errors))
-        raise httpx.HTTPError("All Overpass providers failed")
 
+def _parse_results(data: dict, lat: float, lng: float) -> list[NearbyPlace]:
     results: list[NearbyPlace] = []
     for element in data.get("elements", []):
         tags = element.get("tags", {})
@@ -200,20 +192,44 @@ async def find_nearby_places(
             tags.get("addr:street"),
             tags.get("addr:city"),
         ]
-        address = ", ".join(p for p in address_parts if p) or None
+        address = ", ".join(p.strip() for p in address_parts if p and p.strip()) or None
 
         results.append(
             NearbyPlace(
                 id=f"{element['type']}/{element['id']}",
-                name=name,
+                name=name.strip(),
                 type=classified,
                 latitude=elat,
                 longitude=elng,
                 distance_km=round(_haversine_km(lat, lng, elat, elng), 2),
                 address=address,
-                phone=tags.get("phone") or tags.get("contact:phone"),
+                phone=(tags.get("phone") or tags.get("contact:phone") or "").strip() or None,
             )
         )
+    return results
+
+
+async def find_nearby_places(
+    lat: float, lng: float, radius_m: int, place_type: PlaceType | None, search: str | None = None
+) -> list[NearbyPlace]:
+    if place_type is not None or search:
+        query = _build_query(lat, lng, radius_m, place_type, search)
+        results = _parse_results(await _query_overpass(query), lat, lng)
+    else:
+        # "All" filter: the combined query times out on the public Overpass
+        # instances, so query each place type separately and merge the results.
+        data_list = await asyncio.gather(
+            *(_query_overpass(_build_query(lat, lng, radius_m, pt, None)) for pt in PlaceType),
+            return_exceptions=True,
+        )
+        if all(isinstance(d, Exception) for d in data_list):
+            raise httpx.HTTPError("All Overpass providers failed")
+        results = [
+            place
+            for data in data_list
+            if not isinstance(data, Exception)
+            for place in _parse_results(data, lat, lng)
+        ]
 
     results.sort(key=lambda p: p.distance_km)
     return results

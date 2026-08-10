@@ -1,6 +1,7 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { NearbyPlace } from "@/types";
@@ -35,11 +36,30 @@ interface DoctorsMapProps {
   selectedId?: string | null;
 }
 
+function FitBounds({ userLat, userLng, places }: { userLat: number; userLng: number; places: NearbyPlace[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    if (places.length > 0) {
+      const bounds = L.latLngBounds([
+        [userLat, userLng] as [number, number],
+        ...places.map((p) => [p.latitude, p.longitude] as [number, number]),
+      ]);
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    } else {
+      map.setView([userLat, userLng], 12);
+    }
+  }, [map, userLat, userLng, places]);
+
+  return null;
+}
+
 export function DoctorsMap({ userLat, userLng, places, selectedId }: DoctorsMapProps) {
   return (
     <MapContainer
       center={[userLat, userLng]}
-      zoom={14}
+      zoom={12}
       scrollWheelZoom
       className="h-full w-full rounded-2xl"
     >
@@ -47,6 +67,8 @@ export function DoctorsMap({ userLat, userLng, places, selectedId }: DoctorsMapP
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      <FitBounds userLat={userLat} userLng={userLng} places={places} />
 
       <Circle center={[userLat, userLng]} radius={300} pathOptions={{ color: "#2F6FED", fillOpacity: 0.1 }} />
       <Marker position={[userLat, userLng]} icon={createIcon("#2F6FED", true)}>
