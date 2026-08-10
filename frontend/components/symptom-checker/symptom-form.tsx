@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,17 +11,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getProfile } from "@/services/profile";
 import type { SymptomCheckRequest } from "@/types";
+
+const optionalNumber = (schema: z.ZodNumber) =>
+  z.preprocess((value) => (value === "" || value === null ? undefined : value), schema.optional());
 
 const schema = z.object({
   age: z.coerce.number().min(0).max(120),
   gender: z.enum(["male", "female", "other", "prefer_not_to_say"]),
-  weightKg: z.coerce.number().min(1).max(400).optional().or(z.literal(undefined)),
-  heightCm: z.coerce.number().min(30).max(272).optional().or(z.literal(undefined)),
+  weightKg: optionalNumber(z.coerce.number().min(1).max(400)),
+  heightCm: optionalNumber(z.coerce.number().min(30).max(272)),
   symptoms: z.string().min(3, "Please describe your symptoms"),
   duration: z.string().min(1, "How long has this been going on?"),
   painLevel: z.coerce.number().min(0).max(10),
-  temperatureCelsius: z.coerce.number().min(30).max(45).optional().or(z.literal(undefined)),
+  temperatureCelsius: optionalNumber(z.coerce.number().min(30).max(45)),
   currentMedication: z.string().optional(),
   knownDiseases: z.string().optional(),
   allergies: z.string().optional(),
@@ -37,11 +43,30 @@ export function SymptomForm({ onSubmit, loading }: SymptomFormProps) {
     register,
     control,
     handleSubmit,
+    reset,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { painLevel: 0, gender: "prefer_not_to_say" },
   });
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+  });
+
+  useEffect(() => {
+    if (!profile) return;
+
+    reset({
+      ...getValues(),
+      age: profile.age ?? getValues("age"),
+      gender: profile.gender ?? getValues("gender") ?? "prefer_not_to_say",
+      weightKg: profile.weight_kg ?? getValues("weightKg"),
+      heightCm: profile.height_cm ?? getValues("heightCm"),
+    });
+  }, [profile, reset, getValues]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

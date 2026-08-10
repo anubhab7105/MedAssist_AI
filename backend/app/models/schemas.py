@@ -136,3 +136,7 @@ class NearbyPlacesResponse(BaseModel):
 class ProfileUpdateRequest(BaseModel):
     full_name: Optional[str] = Field(None, max_length=120)
     medical_history: Optional[str] = Field(None, max_length=4000)
+    age: Optional[int] = Field(None, ge=0, le=120)
+    gender: Optional[Gender] = None
+    weight_kg: Optional[float] = Field(None, ge=1, le=400)
+    height_cm: Optional[float] = Field(None, ge=30, le=272)

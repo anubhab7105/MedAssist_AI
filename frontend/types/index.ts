@@ -51,9 +51,14 @@ export interface NearbyPlace {
 export interface UserProfile {
   id: string;
   email: string;
-  fullName?: string;
-  medicalHistory?: string;
-  createdAt: string;
+  full_name?: string | null;
+  medical_history?: string | null;
+  age?: number | null;
+  gender?: Gender | null;
+  weight_kg?: number | null;
+  height_cm?: number | null;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface SymptomHistoryEntry {

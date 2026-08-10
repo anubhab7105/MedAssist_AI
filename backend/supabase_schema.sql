@@ -11,9 +11,19 @@ create table if not exists public.users (
   email text not null,
   full_name text,
   medical_history text,
+  age integer check (age >= 0 and age <= 120),
+  gender text check (gender in ('male', 'female', 'other', 'prefer_not_to_say')),
+  weight_kg double precision check (weight_kg >= 1 and weight_kg <= 400),
+  height_cm double precision check (height_cm >= 30 and height_cm <= 272),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.users
+  add column if not exists age integer check (age >= 0 and age <= 120),
+  add column if not exists gender text check (gender in ('male', 'female', 'other', 'prefer_not_to_say')),
+  add column if not exists weight_kg double precision check (weight_kg >= 1 and weight_kg <= 400),
+  add column if not exists height_cm double precision check (height_cm >= 30 and height_cm <= 272);
 
 -- Auto-create a public.users row whenever someone signs up via Supabase Auth
 create or replace function public.handle_new_user()
