@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 30000,
+  timeout: 60000,
 });
 
 api.interceptors.request.use(async (config) => {

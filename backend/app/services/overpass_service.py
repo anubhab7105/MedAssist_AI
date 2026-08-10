@@ -153,7 +153,7 @@ def _classify(tags: dict) -> PlaceType | None:
 async def _query_overpass(query: str) -> dict:
     """POST a query to the first Overpass provider that answers it."""
     errors: list[str] = []
-    timeout = httpx.Timeout(20.0, connect=5.0)
+    timeout = httpx.Timeout(35.0, connect=5.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
         for url in dict.fromkeys(_OVERPASS_URLS):
             for attempt in range(2):

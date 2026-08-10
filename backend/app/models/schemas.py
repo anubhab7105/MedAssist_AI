@@ -112,7 +112,7 @@ class NearbyPlace(BaseModel):
 class NearbyPlacesRequest(BaseModel):
     latitude: float = Field(..., ge=-90, le=90)
     longitude: float = Field(..., ge=-180, le=180)
-    radius_meters: int = Field(5000, ge=500, le=20000)
+    radius_meters: int = Field(20000, ge=500, le=100000)
     place_type: Optional[PlaceType] = None
     search: Optional[str] = Field(None, max_length=100)
 
