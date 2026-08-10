@@ -6,15 +6,13 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Loader2, LogOut, Trash2 } from "lucide-react";
+import { Loader2, LogOut, Pencil, Trash2, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -28,9 +26,12 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { LogoutDialog } from "@/components/layout/logout-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { getProfile, updateProfile, getChatHistory, getSymptomHistory, deleteAccount } from "@/services/profile";
-import { formatRelativeTime, severityColor } from "@/lib/utils";
+import { getProfile, updateProfile, deleteAccount } from "@/services/profile";
 import type { Gender } from "@/types";
+
+// ---------------------------------------------------------------------------
+// Schema
+// ---------------------------------------------------------------------------
 
 const optionalNumber = (schema: z.ZodNumber) =>
   z.preprocess((value) => (value === "" || value === null ? undefined : value), schema.optional());
@@ -50,11 +51,33 @@ const profileSchema = z.object({
 
 type FormValues = z.infer<typeof profileSchema>;
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const GENDER_LABELS: Record<string, string> = {
+  male: "Male",
+  female: "Female",
+  other: "Other",
+  prefer_not_to_say: "Prefer not to say",
+};
+
+function displayValue(value: string | number | null | undefined, suffix?: string): string {
+  if (value === null || value === undefined || value === "") return "—";
+  return suffix ? `${value} ${suffix}` : String(value);
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const [isEditing, setIsEditing] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -73,6 +96,7 @@ export default function ProfilePage() {
     defaultValues: { gender: "prefer_not_to_say" },
   });
 
+  // Sync form when profile loads
   useEffect(() => {
     if (profile) {
       reset({
@@ -91,6 +115,7 @@ export default function ProfilePage() {
     onSuccess: () => {
       toast({ title: "Profile updated" });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setIsEditing(false);
     },
     onError: (err: Error) => toast({ variant: "danger", title: "Update failed", description: err.message }),
   });
@@ -105,15 +130,29 @@ export default function ProfilePage() {
     onError: (err: Error) => toast({ variant: "danger", title: "Couldn't delete account", description: err.message }),
   });
 
-  const { data: chatHistory, isLoading: chatLoading } = useQuery({
-    queryKey: ["chat-history", 50],
-    queryFn: () => getChatHistory(50),
-  });
+  const handleCancel = () => {
+    if (profile) {
+      reset({
+        full_name: profile.full_name ?? "",
+        medical_history: profile.medical_history ?? "",
+        age: profile.age ?? undefined,
+        gender: profile.gender ?? "prefer_not_to_say",
+        weight_kg: profile.weight_kg ?? undefined,
+        height_cm: profile.height_cm ?? undefined,
+      });
+    }
+    setIsEditing(false);
+  };
 
-  const { data: symptomHistory, isLoading: symptomLoading } = useQuery({
-    queryKey: ["symptom-history", 50],
-    queryFn: () => getSymptomHistory(50),
-  });
+  // ---------------------------------------------------------------------------
+  // Read-only field display
+  // ---------------------------------------------------------------------------
+  const ReadOnlyField = ({ label, value }: { label: string; value: string }) => (
+    <div className="space-y-1">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-sm text-foreground">{value}</p>
+    </div>
+  );
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -123,20 +162,30 @@ export default function ProfilePage() {
           Account center
         </div>
         <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">Profile</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Manage your account and view your history.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Manage your account details.</p>
       </div>
 
+      {/* ----------------------------------------------------------------- */}
+      {/* Account information card                                          */}
+      {/* ----------------------------------------------------------------- */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base">Account information</CardTitle>
+          {!isEditing && !profileLoading && (
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+              <Pencil className="h-3.5 w-3.5" /> Edit
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           {profileLoading ? (
             <div className="space-y-3">
               <Skeleton className="h-11 w-full" />
+              <Skeleton className="h-11 w-full" />
               <Skeleton className="h-24 w-full" />
             </div>
-          ) : (
+          ) : isEditing ? (
+            /* ----- Edit mode ----- */
             <form onSubmit={handleSubmit((v) => updateMutation.mutate(v))} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -197,65 +246,46 @@ export default function ProfilePage() {
                 />
                 {errors.medical_history && <p className="text-xs text-danger">{errors.medical_history.message}</p>}
               </div>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                Save changes
-              </Button>
+              <div className="flex gap-3">
+                <Button type="submit" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Save changes
+                </Button>
+                <Button type="button" variant="outline" onClick={handleCancel}>
+                  <X className="h-4 w-4" /> Cancel
+                </Button>
+              </div>
             </form>
+          ) : (
+            /* ----- Read-only mode ----- */
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email-ro">Email</Label>
+                <Input id="email-ro" value={user?.email ?? ""} disabled />
+              </div>
+
+              <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                <ReadOnlyField label="Full name" value={displayValue(profile?.full_name)} />
+                <ReadOnlyField label="Age" value={displayValue(profile?.age)} />
+                <ReadOnlyField label="Gender" value={GENDER_LABELS[profile?.gender ?? ""] ?? "—"} />
+                <ReadOnlyField label="Weight" value={displayValue(profile?.weight_kg, "kg")} />
+                <ReadOnlyField label="Height" value={displayValue(profile?.height_cm, "cm")} />
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Medical history</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+                  {profile?.medical_history || "—"}
+                </p>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Your history</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="chats">
-            <TabsList>
-              <TabsTrigger value="chats">Chats</TabsTrigger>
-              <TabsTrigger value="symptoms">Symptom checks</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="chats" className="space-y-2">
-              {chatLoading && <Skeleton className="h-16 w-full" />}
-              {!chatLoading && (!chatHistory || chatHistory.length === 0) && (
-                <p className="py-6 text-center text-sm text-muted-foreground">No chat history yet.</p>
-              )}
-              {chatHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-lg border border-border bg-white p-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={entry.role === "user" ? "outline" : "default"}>{entry.role}</Badge>
-                    <span className="text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</span>
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-sm text-foreground">{entry.content}</p>
-                </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="symptoms" className="space-y-2">
-              {symptomLoading && <Skeleton className="h-16 w-full" />}
-              {!symptomLoading && (!symptomHistory || symptomHistory.length === 0) && (
-                <p className="py-6 text-center text-sm text-muted-foreground">No symptom checks yet.</p>
-              )}
-              {symptomHistory?.map((entry: any) => (
-                <div key={entry.id} className="rounded-lg border border-border bg-white p-3">
-                  <div className="flex items-center justify-between">
-                    {entry.response_payload?.severity && (
-                      <Badge className={severityColor(entry.response_payload.severity)} variant="outline">
-                        {entry.response_payload.severity}
-                      </Badge>
-                    )}
-                    <span className="text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</span>
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-sm text-foreground">{entry.request_payload?.symptoms}</p>
-                </div>
-              ))}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
+      {/* ----------------------------------------------------------------- */}
+      {/* Danger zone (unchanged)                                           */}
+      {/* ----------------------------------------------------------------- */}
       <Card className="border-danger/30">
         <CardHeader>
           <CardTitle className="text-base text-danger">Danger zone</CardTitle>
