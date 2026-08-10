@@ -13,7 +13,7 @@ Key features:
 
 MedAssist AI is designed as a safe, educational scaffold rather than a clinical system. It is meant for learning and prototyping, not for real medical diagnosis or treatment.
 
-Live frontend: https://medassist-ctrlv.vercel.app
+Live : https://medassist-ctrlv.vercel.app
 
 ## Local Deployment
 
