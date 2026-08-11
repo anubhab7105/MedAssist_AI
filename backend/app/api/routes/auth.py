@@ -11,9 +11,9 @@ from fastapi import APIRouter, Depends
 
 from app.core.security import get_current_user, AuthenticatedUser
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
-@router.get("/me")
+@router.get("/me", security=[{"BearerAuth": []}])
 async def me(user: AuthenticatedUser = Depends(get_current_user)):
     return {"user_id": user.user_id, "email": user.email}

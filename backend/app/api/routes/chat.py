@@ -22,10 +22,10 @@ from app.services.emergency_detector import detect_emergency, get_emergency_mess
 from app.services.groq_service import stream_chat_completion
 from app.services import supabase_service
 
-router = APIRouter(prefix="/api/chat", tags=["chat"])
+router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
 
 
-@router.post("")
+@router.post("", security=[{"BearerAuth": []}])
 @limiter.limit(AI_RATE)
 async def chat(
     request: Request,

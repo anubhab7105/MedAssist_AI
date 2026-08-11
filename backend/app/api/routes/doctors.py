@@ -5,10 +5,10 @@ from app.core.security import get_current_user, AuthenticatedUser
 from app.models.schemas import NearbyPlacesRequest, NearbyPlacesResponse
 from app.services.overpass_service import find_nearby_places
 
-router = APIRouter(prefix="/api/doctors", tags=["doctors"])
+router = APIRouter(prefix="/api/v1/doctors", tags=["doctors"])
 
 
-@router.post("/nearby", response_model=NearbyPlacesResponse)
+@router.post("/nearby", response_model=NearbyPlacesResponse, security=[{"BearerAuth": []}])
 @limiter.limit(DEFAULT_RATE)
 async def nearby(
     request: Request,

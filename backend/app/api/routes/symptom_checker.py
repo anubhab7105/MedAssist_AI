@@ -8,10 +8,10 @@ from app.services.specialist_mapper import recommend_specialist
 from app.services.groq_service import get_symptom_analysis, build_symptom_prompt, GroqAPIError
 from app.services import supabase_service
 
-router = APIRouter(prefix="/api/symptom-checker", tags=["symptom-checker"])
+router = APIRouter(prefix="/api/v1/symptom-checker", tags=["symptom-checker"])
 
 
-@router.post("", response_model=SymptomCheckResponse)
+@router.post("", response_model=SymptomCheckResponse, security=[{"BearerAuth": []}])
 @limiter.limit(AI_RATE)
 async def check_symptoms(
     request: Request,
