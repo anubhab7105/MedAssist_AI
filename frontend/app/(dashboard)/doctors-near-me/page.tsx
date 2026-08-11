@@ -55,7 +55,7 @@ export default function DoctorsNearMePage() {
         latitude!,
         longitude!,
         filter === "all" ? undefined : filter,
-        50000,
+        90000,
         debouncedSearch || undefined
       ),
     enabled: latitude !== null && longitude !== null,
