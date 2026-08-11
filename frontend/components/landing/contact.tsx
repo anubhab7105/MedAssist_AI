@@ -1,25 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xoeadkoo";
+
 export function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Form submission failed");
+      }
+
+      toast({ title: "Message sent", description: "We'll get back to you within 1-2 business days." });
+      form.reset();
+    } catch {
+      toast({
+        variant: "danger",
+        title: "Message not sent",
+        description: "Please try again in a moment.",
+      });
+    } finally {
       setSubmitting(false);
-      toast({ title: "Message sent", description: "We'll get back to you within 1–2 business days." });
-      e.currentTarget.reset();
-    }, 700);
+    }
   }
 
   return (
@@ -31,11 +53,8 @@ export function Contact() {
             Questions or feedback?
           </h2>
           <p className="mt-4 max-w-md text-muted-foreground">
-            Whether it&apos;s a bug report, a feature idea, or a partnership inquiry — we read everything.
+            Whether it&apos;s a bug report, a feature idea, or a partnership inquiry, we read everything.
           </p>
-          <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <Mail className="h-4 w-4" /> support@medassist.ai
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-soft">
