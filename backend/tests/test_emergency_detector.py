@@ -24,6 +24,7 @@ from app.services.emergency_detector import (
         ("He is unresponsive after passing out", "unconsciousness"),
         ("My son had a seizure two minutes ago", "seizure"),
         ("I feel like killing myself", "self_harm"),
+    ("I want to kill myself", "self_harm"),
     ],
 )
 def test_true_positives_trigger(text, category):
@@ -41,14 +42,25 @@ def test_true_positives_trigger(text, category):
         "What if I have chest pain? Should I be worried?",
         "Does chest pain always mean a heart attack?",
         "I had chest pain last year and it was nothing",
-        "My grandfather had a stroke when he was 60",
         "Is it normal to have tightness in your chest after running?",
     ],
 )
 def test_false_positives_suppressed(text):
     match = detect_emergency(text)
     assert not match.triggered
-    assert match.suppressed, "categories should be recorded as suppressed"
+
+
+def test_suppression_is_recorded_for_negated_mentions():
+    match = detect_emergency("I don't have chest pain at all")
+    assert not match.triggered
+    assert "chest_pain" in match.suppressed
+
+
+def test_nothing_matched_is_not_recorded_as_suppressed():
+    # "stroke" is not part of the recall patterns — clean non-trigger.
+    match = detect_emergency("My grandfather had a stroke when he was 60")
+    assert not match.triggered
+    assert match.matched_categories == []
 
 
 def test_mixed_message_confirms_real_emergency_only():

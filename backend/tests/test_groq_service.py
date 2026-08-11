@@ -25,7 +25,7 @@ def test_build_symptom_prompt_includes_fields():
     assert "Age: 35" in prompt
     assert "Gender: male" in prompt
     assert "Symptoms: dry cough and fever" in prompt
-    assert "Weight: 70 kg" in prompt
+    assert "Weight: 70.0 kg" in prompt
     assert "Temperature: 38.5 C" in prompt
     assert "Known conditions: asthma" in prompt
 

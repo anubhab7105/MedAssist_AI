@@ -38,7 +38,7 @@ _EMERGENCY_PATTERNS: dict[str, list[str]] = {
     "chest_pain": [
         r"\bchest pain\b",
         r"\bcrushing (feeling|pressure|pain)\b.*\bchest\b",
-        r"\btightness in (my |the )?chest\b",
+        r"\btightness in (my |the |your |his |her |their |our )?chest\b",
         r"\bpain (radiating|spreading) (to|down) (my |the )?(arm|jaw)\b",
     ],
     "stroke": [
@@ -101,11 +101,11 @@ _NEGATION_TERMS = (
 _NEGATION_RE = re.compile("|".join(_NEGATION_TERMS), re.IGNORECASE)
 
 # Historical/past phrasing — "I had chest pain last year" is not a 911 call.
-# Deliberately conservative: bare "was"/"were"/"lasted" are excluded because
-# they also appear in descriptions of ongoing events ("I was walking and
-# suddenly passed out"), and suppressing those is unsafe.
+# Deliberately conservative. Bare "had" is excluded on purpose: "my son had
+# a seizure two minutes ago" is an acute emergency, not a memory. Only
+# unambiguous past markers trigger suppression.
 _PAST_TERMS = (
-    r"\bhad\b", r"\bhistory of\b", r"\bin the past\b",
+    r"\bhistory of\b", r"\bin the past\b",
     r"\blast (year|month|week|night|time)\b", r"\bwhen i was\b",
     r"\bprevious\b", r"\bused to\b", r"\brecovered\b", r"\bmonths? ago\b",
     r"\byears? ago\b",
@@ -124,17 +124,31 @@ _HYPOTHETICAL_RE = re.compile("|".join(_HYPOTHETICAL_TERMS), re.IGNORECASE)
 
 _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 
+# Contrast markers split clauses: in "No chest pain, but I have trouble
+# breathing", the negation only governs the first clause.
+_CONTRAST_RE = re.compile(r"\b(but|however|yet|although|though)\b", re.IGNORECASE)
+
 # Self-harm is intentionally NOT suppressible: any mention, even
 # hypothetical, gets the crisis message.
 _NON_SUPPRESSIBLE = {"self_harm"}
 
 
-def _context_suppresses(sentence: str) -> bool:
-    """Stage 2: decide whether a matched sentence describes an ongoing
+def _clause_of(sentence: str, match_end: int) -> str:
+    """The clause that governs a match: the sentence prefix up to the
+    match, cut at the last contrast marker (negation/past only bind
+    within one clause)."""
+    prefix = sentence[:match_end]
+    parts = _CONTRAST_RE.split(prefix)
+    return parts[-1]
+
+
+def _context_suppresses(sentence: str, match_end: int) -> bool:
+    """Stage 2: decide whether a matched phrase describes an ongoing
     emergency or is negated / historical / hypothetical."""
-    if _NEGATION_RE.search(sentence):
+    clause = _clause_of(sentence, match_end)
+    if _NEGATION_RE.search(clause):
         return True
-    if _PAST_RE.search(sentence):
+    if _PAST_RE.search(clause):
         return True
     if _HYPOTHETICAL_RE.search(sentence):
         return True
@@ -163,12 +177,15 @@ def detect_emergency(text: str) -> EmergencyMatch:
             confirmed.append(category)
             continue
 
-        # Find the sentence(s) containing a match for this category.
-        hit_sentences = [
-            s for s in sentences if any(m.group(0).lower() in s.lower() for m in matches)
-        ] or sentences
+        # The category fires unless every governing clause suppresses it.
+        contexts = [
+            (sentence, match.end())
+            for sentence in sentences
+            for match in matches
+            if match.group(0).lower() in sentence.lower()
+        ] or [(sentence, sentence.find(matches[0].group(0)) + len(matches[0].group(0))) for sentence in sentences]
 
-        if any(not _context_suppresses(s) for s in hit_sentences):
+        if any(not _context_suppresses(*ctx) for ctx in contexts):
             confirmed.append(category)
         else:
             suppressed.append(category)

@@ -21,16 +21,32 @@ limiter = Limiter(key_func=get_remote_address)
 DEFAULT_RATE = f"{settings.rate_limit_per_minute}/minute"
 AI_RATE = f"{max(settings.rate_limit_per_minute // 2, 5)}/minute"
 
+# slowapi validates rate strings lazily (at request time), so we parse
+# them ourselves at boot to fail fast on misconfiguration.
+_RATE_RE = r"^(?P<count>\d+)/(?P<unit>second|minute|hour|day)$"
+import re as _re
+
+
+def parse_rate_string(rate: str) -> tuple[int, str]:
+    """Validate a slowapi rate string like '20/minute'. Returns (count, unit)."""
+    match = _re.fullmatch(_RATE_RE, rate.strip())
+    if not match:
+        raise ValueError(f"'{rate}' is not a valid rate (expected e.g. '20/minute')")
+    count = int(match.group("count"))
+    if count < 1:
+        raise ValueError("rate count must be at least 1")
+    return count, match.group("unit")
+
 
 def validate_rate_limit_config() -> None:
-    """Belt-and-braces check at app boot: the limiter must be attached to
-    app.state and the configured rate must parse as a valid slowapi rate
-    string. Called from app.main before routes are served."""
-    try:
-        limiter.limit(DEFAULT_RATE)  # raises ValueError on garbage rates
-        limiter.limit(AI_RATE)
-    except ValueError as exc:
-        raise RuntimeError(
-            "Invalid rate limit configuration derived from "
-            f"RATE_LIMIT_PER_MINUTE={settings.rate_limit_per_minute}: {exc}"
-        ) from exc
+    """Belt-and-braces check at app boot: the rates derived from
+    RATE_LIMIT_PER_MINUTE must parse as valid slowapi rate strings.
+    Called from app.main before routes are served."""
+    for label, rate in (("DEFAULT_RATE", DEFAULT_RATE), ("AI_RATE", AI_RATE)):
+        try:
+            parse_rate_string(rate)
+        except ValueError as exc:
+            raise RuntimeError(
+                "Invalid rate limit configuration derived from "
+                f"RATE_LIMIT_PER_MINUTE={settings.rate_limit_per_minute}: {exc}"
+            ) from exc
