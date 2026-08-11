@@ -101,10 +101,14 @@ _NEGATION_TERMS = (
 _NEGATION_RE = re.compile("|".join(_NEGATION_TERMS), re.IGNORECASE)
 
 # Historical/past phrasing — "I had chest pain last year" is not a 911 call.
+# Deliberately conservative: bare "was"/"were"/"lasted" are excluded because
+# they also appear in descriptions of ongoing events ("I was walking and
+# suddenly passed out"), and suppressing those is unsafe.
 _PAST_TERMS = (
-    r"\bhad\b", r"\blasted\b", r"\bwas\b", r"\bwere\b", r"\bhistory of\b",
-    r"\bin the past\b", r"\blast (year|month|week|night|time)\b",
-    r"\bwhen i was\b", r"\bprevious\b", r"\bused to\b", r"\brecovered\b",
+    r"\bhad\b", r"\bhistory of\b", r"\bin the past\b",
+    r"\blast (year|month|week|night|time)\b", r"\bwhen i was\b",
+    r"\bprevious\b", r"\bused to\b", r"\brecovered\b", r"\bmonths? ago\b",
+    r"\byears? ago\b",
 )
 _PAST_RE = re.compile("|".join(_PAST_TERMS), re.IGNORECASE)
 
