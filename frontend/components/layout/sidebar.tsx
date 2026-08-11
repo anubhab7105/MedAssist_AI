@@ -31,7 +31,7 @@ export function Sidebar() {
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? "MA";
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-[#c3c6d4] bg-white/85 backdrop-blur-xl md:flex">
+    <aside className="hidden h-screen w-64 shrink-0 flex-col border-r border-[#c3c6d4] bg-white/85 backdrop-blur-xl md:flex">
       <Link href="/" className="flex h-[72px] items-center gap-2 px-6 font-display text-lg font-bold text-primary">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary shadow-[0_6px_16px_-10px_rgba(0,49,120,0.75)]">
           <Activity className="h-4.5 w-4.5 text-white" />
@@ -83,4 +83,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
