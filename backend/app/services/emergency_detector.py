@@ -1,22 +1,34 @@
 """
-Emergency detection.
+Emergency detection (two-stage).
 
-This runs on every symptom-checker submission and every chat message
-BEFORE anything is sent to Groq. If a red-flag pattern is matched, the AI
-call is skipped entirely and the user is shown an emergency banner
-instead. This is a deliberately blunt, high-recall keyword/phrase layer —
-false positives (over-triggering) are the safe failure mode here, not
-false negatives.
+Runs on every symptom-checker submission and every chat message BEFORE
+anything is sent to Groq. If a red-flag pattern survives both stages, the
+AI call is skipped entirely and the user is shown an emergency banner
+instead.
+
+Stage 1 — Pattern match: broad, deliberate high-recall regex layer.
+Stage 2 — Contextual filter: checks the sentence around each match for
+negation ("no", "not", "denies"), past/historical phrasing, or
+hypotheticals ("what if", "does ... mean") and suppresses matches that
+are clearly not describing an ongoing emergency. This is a deterministic
+surrogate for a classifier — every suppression rule is explicit,
+unit-testable, and biased toward the safe failure mode (keep the
+emergency banner when in doubt).
 """
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+# Weight for a category that survives the contextual filter.
+CONFIRMED_CONFIDENCE = 0.9
 
 
 @dataclass
 class EmergencyMatch:
     triggered: bool
     matched_categories: list[str]
+    confidence: float = 0.0
+    suppressed: list[str] = field(default_factory=list)
 
 
 # Each category maps to a list of regex patterns (case-insensitive).
@@ -77,6 +89,110 @@ _COMPILED = {
     for category, patterns in _EMERGENCY_PATTERNS.items()
 }
 
+# Stage 2 vocabulary -------------------------------------------------------
+
+# Words/phrases that clearly negate the symptom when near a match.
+_NEGATION_TERMS = (
+    r"\bno\b", r"\bnot\b", r"\bnever\b", r"\bwithout\b", r"\bdenies\b",
+    r"\bdenied\b", r"\bdoesn'?t\b", r"\bdon'?t\b", r"\bdidn'?t\b",
+    r"\bisn'?t\b", r"\bwasn'?t\b", r"\bno longer\b", r"\bhardly\b",
+    r"\bunlikely to\b",
+)
+_NEGATION_RE = re.compile("|".join(_NEGATION_TERMS), re.IGNORECASE)
+
+# Historical/past phrasing — "I had chest pain last year" is not a 911 call.
+_PAST_TERMS = (
+    r"\bhad\b", r"\blasted\b", r"\bwas\b", r"\bwere\b", r"\bhistory of\b",
+    r"\bin the past\b", r"\blast (year|month|week|night|time)\b",
+    r"\bwhen i was\b", r"\bprevious\b", r"\bused to\b", r"\brecovered\b",
+)
+_PAST_RE = re.compile("|".join(_PAST_TERMS), re.IGNORECASE)
+
+# Hypotheticals / questions — "what if I have chest pain?" is not an emergency.
+_HYPOTHETICAL_TERMS = (
+    r"\bwhat if\b", r"\bsuppose\b", r"\bimagine\b", r"\bhypothetical\b",
+    r"\bhypothetically\b", r"\bpretend\b", r"\bscenario\b", r"\bexample\b",
+    r"\bif i (had|have|get)\b", r"\bwould\b", r"\bcould\b", r"\bmight\b",
+    r"\bdoes .*\bmean\b", r"\bshould i\b", r"\bask\b", r"\basked\b",
+    r"\bwondering\b", r"\bcurious\b", r"\bis it (normal|bad|serious|dangerous)\b",
+)
+_HYPOTHETICAL_RE = re.compile("|".join(_HYPOTHETICAL_TERMS), re.IGNORECASE)
+
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+
+# Self-harm is intentionally NOT suppressible: any mention, even
+# hypothetical, gets the crisis message.
+_NON_SUPPRESSIBLE = {"self_harm"}
+
+
+def _context_suppresses(sentence: str) -> bool:
+    """Stage 2: decide whether a matched sentence describes an ongoing
+    emergency or is negated / historical / hypothetical."""
+    if _NEGATION_RE.search(sentence):
+        return True
+    if _PAST_RE.search(sentence):
+        return True
+    if _HYPOTHETICAL_RE.search(sentence):
+        return True
+    return False
+
+
+def detect_emergency(text: str) -> EmergencyMatch:
+    """Two-stage detection: regex recall first, contextual precision second."""
+    raw_matches: dict[str, list[re.Match]] = {}
+    for category, patterns in _COMPILED.items():
+        for pattern in patterns:
+            match = pattern.search(text)
+            if match:
+                raw_matches.setdefault(category, []).append(match)
+                break  # one pattern per category is enough to record it
+
+    if not raw_matches:
+        return EmergencyMatch(triggered=False, matched_categories=[])
+
+    sentences = _SENTENCE_SPLIT_RE.split(text)
+    confirmed: list[str] = []
+    suppressed: list[str] = []
+
+    for category, matches in raw_matches.items():
+        if category in _NON_SUPPRESSIBLE:
+            confirmed.append(category)
+            continue
+
+        # Find the sentence(s) containing a match for this category.
+        hit_sentences = [
+            s for s in sentences if any(m.group(0).lower() in s.lower() for m in matches)
+        ] or sentences
+
+        if any(not _context_suppresses(s) for s in hit_sentences):
+            confirmed.append(category)
+        else:
+            suppressed.append(category)
+
+    if not confirmed:
+        return EmergencyMatch(
+            triggered=False,
+            matched_categories=[],
+            suppressed=suppressed,
+        )
+
+    confidence = CONFIRMED_CONFIDENCE * (1 + 0.05 * (len(confirmed) - 1))
+    return EmergencyMatch(
+        triggered=True,
+        matched_categories=confirmed,
+        confidence=min(confidence, 1.0),
+        suppressed=suppressed,
+    )
+
+
+def get_emergency_message(match: EmergencyMatch) -> str:
+    """Self-harm matches get crisis-line messaging instead of the generic
+    'go to the ER' copy — the right next step is different."""
+    if "self_harm" in match.matched_categories:
+        return SELF_HARM_MESSAGE
+    return EMERGENCY_MESSAGE
+
+
 EMERGENCY_MESSAGE = (
     "🚨 Seek immediate emergency medical attention. Based on what you've "
     "described, this may be a medical emergency. Please call your local "
@@ -97,19 +213,3 @@ SELF_HARM_MESSAGE = (
     "support, and a trained person is ready to help right now. This "
     "assistant cannot provide crisis counseling."
 )
-
-
-def detect_emergency(text: str) -> EmergencyMatch:
-    matched: list[str] = []
-    for category, patterns in _COMPILED.items():
-        if any(p.search(text) for p in patterns):
-            matched.append(category)
-    return EmergencyMatch(triggered=bool(matched), matched_categories=matched)
-
-
-def get_emergency_message(match: EmergencyMatch) -> str:
-    """Self-harm matches get crisis-line messaging instead of the generic
-    'go to the ER' copy — the right next step is different."""
-    if "self_harm" in match.matched_categories:
-        return SELF_HARM_MESSAGE
-    return EMERGENCY_MESSAGE
