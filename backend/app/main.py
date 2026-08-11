@@ -42,7 +42,7 @@ validate_rate_limit_config()
 
 app.state.limiter = limiter
 
-API_PREFIX = "/api/v1"
+API_PREFIX = "/api/v1"  # reserved; routers are mounted with a versioned prefix
 
 
 @app.exception_handler(RateLimitExceeded)

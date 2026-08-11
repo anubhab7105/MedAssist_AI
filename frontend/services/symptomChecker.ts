@@ -4,7 +4,7 @@ import type { SymptomCheckRequest, SymptomCheckResponse } from "@/types";
 export async function checkSymptoms(
   payload: SymptomCheckRequest
 ): Promise<SymptomCheckResponse> {
-  const { data } = await api.post("/api/symptom-checker", {
+  const { data } = await api.post("/api/v1/symptom-checker", {
     age: payload.age,
     gender: payload.gender,
     weight_kg: payload.weightKg,

@@ -8,7 +8,7 @@ export async function findNearbyPlaces(
   radiusMeters = 50000,
   search?: string
 ): Promise<NearbyPlace[]> {
-  const { data } = await api.post("/api/doctors/nearby", {
+  const { data } = await api.post("/api/v1/doctors/nearby", {
     latitude,
     longitude,
     radius_meters: radiusMeters,
