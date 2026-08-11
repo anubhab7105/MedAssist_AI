@@ -1,6 +1,10 @@
 """
 Queries OpenStreetMap's Overpass API for nearby medical points of
 interest around a given lat/lng, and ranks results by distance.
+
+All external calls go through app.core.http_client (circuit breaker +
+retry), and every dynamic value that ends up inside an Overpass query
+string is strictly sanitized before interpolation.
 """
 
 import math
@@ -11,6 +15,7 @@ import logging
 import httpx
 
 from app.core.config import get_settings
+from app.core.http_client import request_with_retry
 from app.models.schemas import NearbyPlace, PlaceType
 
 settings = get_settings()
@@ -72,6 +77,11 @@ _SEARCH_AMENITY = (
     "health_centre|health_center"
 )
 
+# Free-text search input is allow-listed to letters, digits, spaces and a
+# few separators. Anything else is rejected rather than escaped, so the
+# query string can never be corrupted by unusual characters.
+_SEARCH_ALLOWLIST = re.compile(r"^[A-Za-z0-9 .\-,']+$")
+
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     r = 6371.0
@@ -80,10 +90,6 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     d_lambda = math.radians(lon2 - lon1)
     a = math.sin(d_phi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(d_lambda / 2) ** 2
     return 2 * r * math.asin(math.sqrt(a))
-
-
-def _escape_regex(term: str) -> str:
-    return term.replace("\\", "\\\\").replace('"', '\\"').replace("/", "\\/")
 
 
 def _ci_regex(term: str) -> str:
@@ -99,9 +105,24 @@ def _ci_regex(term: str) -> str:
     )
 
 
+def sanitize_search(term: str) -> str:
+    """Validate a free-text search term for safe use inside an Overpass
+    query. Raises ValueError for empty or disallowed input; everything
+    the allowlist keeps is already safe to interpolate (letters, digits,
+    spaces, '.', '-', ',' and apostrophes — all regex-escaped below)."""
+    term = term.strip()
+    if not term:
+        raise ValueError("Search term must not be empty")
+    if len(term) > 100:
+        raise ValueError("Search term must be 100 characters or fewer")
+    if not _SEARCH_ALLOWLIST.match(term):
+        raise ValueError("Search term contains unsupported characters")
+    return re.sub(r"\s+", " ", term)
+
+
 def _build_query(lat: float, lng: float, radius_m: int, place_type: PlaceType | None, search: str | None) -> str:
     if search:
-        name_re = _ci_regex(search)
+        name_re = _ci_regex(sanitize_search(search))
         return f"""
 [out:json][timeout:20];
 (
@@ -151,19 +172,25 @@ def _classify(tags: dict) -> PlaceType | None:
 
 
 async def _query_overpass(query: str) -> dict:
-    """POST a query to the first Overpass provider that answers it."""
+    """POST a query to the first Overpass provider that answers it.
+    Runs through the shared circuit breaker + retry logic."""
+    timeout = httpx.Timeout(settings.overpass_timeout_seconds, connect=5.0)
     errors: list[str] = []
-    timeout = httpx.Timeout(35.0, connect=5.0)
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        for url in dict.fromkeys(_OVERPASS_URLS):
-            for attempt in range(2):
-                try:
-                    response = await client.post(url, data={"data": query})
-                    response.raise_for_status()
-                    return response.json()
-                except httpx.HTTPError as exc:
-                    errors.append(f"{url} (attempt {attempt + 1}): {exc}")
-                    await asyncio.sleep(1.5)
+
+    for url in dict.fromkeys(_OVERPASS_URLS):
+        try:
+            response = await request_with_retry(
+                "POST",
+                url,
+                timeout=timeout,
+                data={"data": query},
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPError as exc:
+            errors.append(f"{url}: {exc}")
+            continue
+
     raise httpx.HTTPError(f"All Overpass providers failed: {' | '.join(errors)}")
 
 
