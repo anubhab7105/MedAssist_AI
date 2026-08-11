@@ -41,7 +41,7 @@ export default function ChatPage() {
   } = useChat();
 
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [history, setHistory] = useState<LocalChatConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const prevIsStreaming = useRef(isStreaming);

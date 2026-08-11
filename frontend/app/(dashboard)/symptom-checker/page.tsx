@@ -42,7 +42,7 @@ export default function SymptomCheckerPage() {
 
   const [view, setView] = useState<ViewState>({ kind: "form" });
   const [history, setHistory] = useState<LocalSymptomRecord[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const userId = user?.id ?? "";
 
