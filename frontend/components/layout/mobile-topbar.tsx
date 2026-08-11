@@ -21,26 +21,32 @@ export function MobileTopbar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-16 items-center justify-between border-b border-[#c3c6d4] bg-white/90 px-4 backdrop-blur-xl md:hidden">
+    <div className="relative z-[1200] flex h-16 items-center justify-between border-b border-[#c3c6d4] bg-white/90 px-4 backdrop-blur-xl md:hidden">
       <Link href="/" className="flex items-center gap-2 font-display font-bold text-primary">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
           <Activity className="h-4.5 w-4.5 text-white" />
         </span>
         MedAssist AI
       </Link>
-      <button onClick={() => setOpen(true)} aria-label="Open menu" className="p-2 text-foreground">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={open}
+        className="p-2 text-foreground"
+      >
         <Menu className="h-5 w-5" />
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl animate-in fade-in-0 zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[1300] bg-background/95 backdrop-blur-xl animate-in fade-in-0 zoom-in-95 duration-200">
           <div className="flex h-16 items-center justify-between border-b border-[#c3c6d4] px-4">
             <span className="font-display font-semibold text-foreground">Menu</span>
-            <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-2 text-foreground">
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="p-2 text-foreground">
               <X className="h-5 w-5" />
             </button>
           </div>
-          <nav className="flex flex-col gap-1 px-3">
+          <nav className="flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto px-3 py-3">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -57,7 +63,10 @@ export function MobileTopbar() {
             ))}
             <LogoutDialog
               trigger={
-                <button className="mt-4 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-danger">
+                <button
+                  type="button"
+                  className="mt-4 flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-danger"
+                >
                   <LogOut className="h-5 w-5" />
                   Log out
                 </button>
@@ -69,4 +78,3 @@ export function MobileTopbar() {
     </div>
   );
 }
-
