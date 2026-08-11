@@ -8,7 +8,7 @@ from app.services.supabase_service import ensure_user_profile, get_supabase
 router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
 
 
-@router.get("", security=[{"BearerAuth": []}])
+@router.get("")
 async def get_profile(user: AuthenticatedUser = Depends(get_current_user)):
     await ensure_user_profile(user.user_id, user.email)
     client = get_supabase()
@@ -19,7 +19,7 @@ async def get_profile(user: AuthenticatedUser = Depends(get_current_user)):
         return await ensure_user_profile(user.user_id, user.email)
 
 
-@router.put("", security=[{"BearerAuth": []}])
+@router.put("")
 async def update_profile(
     payload: ProfileUpdateRequest, user: AuthenticatedUser = Depends(get_current_user)
 ):
@@ -32,7 +32,7 @@ async def update_profile(
     return result.data[0] if result.data else updates
 
 
-@router.get("/chat-history", security=[{"BearerAuth": []}])
+@router.get("/chat-history")
 async def chat_history(user: AuthenticatedUser = Depends(get_current_user), limit: int = 50):
     client = get_supabase()
     try:
@@ -49,7 +49,7 @@ async def chat_history(user: AuthenticatedUser = Depends(get_current_user), limi
         return []
 
 
-@router.get("/symptom-history", security=[{"BearerAuth": []}])
+@router.get("/symptom-history")
 async def symptom_history(user: AuthenticatedUser = Depends(get_current_user), limit: int = 50):
     client = get_supabase()
     try:
@@ -66,7 +66,7 @@ async def symptom_history(user: AuthenticatedUser = Depends(get_current_user), l
         return []
 
 
-@router.delete("/account", security=[{"BearerAuth": []}])
+@router.delete("/account")
 async def delete_account(user: AuthenticatedUser = Depends(get_current_user)):
     """Deletes the user's row data, then the Supabase auth user itself
     (requires the service-role client, which is why this must happen

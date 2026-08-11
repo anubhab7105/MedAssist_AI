@@ -63,11 +63,11 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
 
-app.include_router(auth.router, prefix=API_PREFIX)
-app.include_router(chat.router, prefix=API_PREFIX)
-app.include_router(symptom_checker.router, prefix=API_PREFIX)
-app.include_router(doctors.router, prefix=API_PREFIX)
-app.include_router(profile.router, prefix=API_PREFIX)
+app.include_router(auth.router)
+app.include_router(chat.router)
+app.include_router(symptom_checker.router)
+app.include_router(doctors.router)
+app.include_router(profile.router)
 
 
 def custom_openapi():
@@ -89,6 +89,10 @@ def custom_openapi():
         "bearerFormat": "JWT",
         "description": "Supabase-issued access token. Attach as `Authorization: Bearer <token>`.",
     }
+    # Every endpoint (except /health, /docs) requires the Supabase JWT, so
+    # apply it as the document-wide default — /docs shows the Authorize
+    # button without per-route security args on every operation.
+    schema["security"] = [{"BearerAuth": []}]
     app.openapi_schema = schema
     return schema
 

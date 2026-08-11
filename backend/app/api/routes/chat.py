@@ -25,7 +25,7 @@ from app.services import supabase_service
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
 
 
-@router.post("", security=[{"BearerAuth": []}])
+@router.post("")
 @limiter.limit(AI_RATE)
 async def chat(
     request: Request,

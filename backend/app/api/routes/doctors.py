@@ -8,7 +8,7 @@ from app.services.overpass_service import find_nearby_places
 router = APIRouter(prefix="/api/v1/doctors", tags=["doctors"])
 
 
-@router.post("/nearby", response_model=NearbyPlacesResponse, security=[{"BearerAuth": []}])
+@router.post("/nearby", response_model=NearbyPlacesResponse)
 @limiter.limit(DEFAULT_RATE)
 async def nearby(
     request: Request,

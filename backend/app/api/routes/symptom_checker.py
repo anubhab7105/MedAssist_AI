@@ -11,7 +11,7 @@ from app.services import supabase_service
 router = APIRouter(prefix="/api/v1/symptom-checker", tags=["symptom-checker"])
 
 
-@router.post("", response_model=SymptomCheckResponse, security=[{"BearerAuth": []}])
+@router.post("", response_model=SymptomCheckResponse)
 @limiter.limit(AI_RATE)
 async def check_symptoms(
     request: Request,
