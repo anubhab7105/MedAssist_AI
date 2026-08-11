@@ -65,7 +65,7 @@ function GoogleFitBounds({ userLat, userLng, places }: { userLat: number; userLn
 
 const DOT_SVG = "M0 0m-5 0a5 5 0 1 0 10 0a5 5 0 1 0-10 0";
 
-function dotIcon(color: string, scale = 7) {
+function dotIcon(color: string, scale = 2.2) {
   return {
     path: DOT_SVG,
     scale,
@@ -99,7 +99,7 @@ function GoogleDoctorsMap({ userLat, userLng, places, selectedId }: DoctorsMapPr
           radius={300}
           options={{ strokeColor: "#2F6FED", strokeOpacity: 0.8, fillColor: "#2F6FED", fillOpacity: 0.1 }}
         />
-        <Marker position={center} icon={dotIcon("#2F6FED", 9)} title="You are here" />
+        <Marker position={center} icon={dotIcon("#2F6FED", 2.6)} title="You are here" />
 
         {places.map((place) => (
           <Marker
