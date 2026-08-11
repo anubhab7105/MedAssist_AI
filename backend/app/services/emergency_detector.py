@@ -133,13 +133,17 @@ _CONTRAST_RE = re.compile(r"\b(but|however|yet|although|though)\b", re.IGNORECAS
 _NON_SUPPRESSIBLE = {"self_harm"}
 
 
+_TRAILING_CONTEXT_CHARS = 60
+
+
 def _clause_of(sentence: str, match_end: int) -> str:
     """The clause that governs a match: the sentence prefix up to the
     match, cut at the last contrast marker (negation/past only bind
-    within one clause)."""
+    within one clause), plus a short trailing window — markers like
+    "chest pain LAST YEAR" land after the match itself."""
     prefix = sentence[:match_end]
     parts = _CONTRAST_RE.split(prefix)
-    return parts[-1]
+    return parts[-1] + sentence[match_end : match_end + _TRAILING_CONTEXT_CHARS]
 
 
 def _context_suppresses(sentence: str, match_end: int) -> bool:

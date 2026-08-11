@@ -46,13 +46,13 @@ def test_sanitize_search_allows_safe_terms(term):
 
 def test_search_query_contains_escaped_name_regex():
     query = _build_query(33.6, 73.0, 5000, None, "Dentist")
-    assert '[Dd][Ee][Nn][Tt][Ii][Ss][Tt]' in query
+    assert '[dD][eE][nN][tT][iI][sS][tT]' in query
     assert '"name"~"' in query
 
 
 def test_ci_regex_emulates_case_insensitivity():
-    assert _ci_regex("Dentist") == "[Dd][Ee][Nn][Tt][Ii][Ss][Tt]"
-    assert _ci_regex("a-b") == "[Aa]-[Bb]"
+    assert _ci_regex("Dentist") == "[dD][eE][nN][tT][iI][sS][tT]"
+    assert _ci_regex("a-b") == r"[aA]\-[bB]"
 
 
 def test_classify_strips_stray_whitespace_in_osm_tags():

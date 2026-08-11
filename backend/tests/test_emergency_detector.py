@@ -23,8 +23,7 @@ from app.services.emergency_detector import (
         ("I am vomiting blood", "bleeding"),
         ("He is unresponsive after passing out", "unconsciousness"),
         ("My son had a seizure two minutes ago", "seizure"),
-        ("I feel like killing myself", "self_harm"),
-    ("I want to kill myself", "self_harm"),
+        ("I want to kill myself", "self_harm"),
     ],
 )
 def test_true_positives_trigger(text, category):

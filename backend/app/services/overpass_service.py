@@ -80,7 +80,7 @@ _SEARCH_AMENITY = (
 # Free-text search input is allow-listed to letters, digits, spaces and a
 # few separators. Anything else is rejected rather than escaped, so the
 # query string can never be corrupted by unusual characters.
-_SEARCH_ALLOWLIST = re.compile(r"^[A-Za-z0-9 .\-,']+$")
+_SEARCH_ALLOWLIST = re.compile(r"^[A-Za-z0-9 .,'\-&+]+$")
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

@@ -1,5 +1,8 @@
 """Groq service tests: prompt building, JSON parsing, error surfacing."""
 
+import asyncio
+import json
+
 import pytest
 
 from app.models.schemas import Gender, SymptomCheckRequest
@@ -101,5 +104,4 @@ def test_get_symptom_analysis_wraps_fetch_failures(monkeypatch):
 
 
 def asyncio_run(coro):
-    import asyncio
     return asyncio.run(coro)

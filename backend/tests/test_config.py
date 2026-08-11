@@ -64,5 +64,5 @@ def test_graceful_boot_error_names_missing_var(monkeypatch):
 
 
 def test_supabase_project_url_normalizes_suffixes():
-    s = Settings(supabase_url="https://proj.supabase.co/rest/v1", **_BASE, **_CORS_DEFAULT)
+    s = Settings(**_BASE | {"supabase_url": "https://proj.supabase.co/rest/v1"}, **_CORS_DEFAULT)
     assert s.supabase_project_url == "https://proj.supabase.co"
