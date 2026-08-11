@@ -20,13 +20,23 @@ export async function updateProfile(payload: ProfileUpdatePayload): Promise<User
   return data;
 }
 
-export async function getChatHistory(limit = 50) {
-  const { data } = await api.get(`/api/v1/profile/chat-history?limit=${limit}`);
+export async function getChatHistory(limit = 200, days = 10) {
+  const { data } = await api.get(`/api/v1/profile/chat-history?limit=${limit}&days=${days}`);
   return data;
 }
 
-export async function getSymptomHistory(limit = 50) {
-  const { data } = await api.get(`/api/v1/profile/symptom-history?limit=${limit}`);
+export async function getChatConversation(conversationId: string) {
+  const { data } = await api.get(`/api/v1/profile/chat-conversation/${conversationId}`);
+  return data;
+}
+
+export async function getSymptomHistory(limit = 200, days = 10) {
+  const { data } = await api.get(`/api/v1/profile/symptom-history?limit=${limit}&days=${days}`);
+  return data;
+}
+
+export async function getSymptomCheck(checkId: string) {
+  const { data } = await api.get(`/api/v1/profile/symptom-check/${checkId}`);
   return data;
 }
 

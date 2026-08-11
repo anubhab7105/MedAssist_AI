@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, MessageSquare, PanelLeftClose, PanelLeftOpen, Plus, Trash2 } from "lucide-react";
 import { useChat } from "@/hooks/useChat";
@@ -13,7 +14,9 @@ import {
   deleteChatConversation,
   buildChatConversation,
 } from "@/lib/localHistory";
+import { getChatConversation } from "@/services/profile";
 import type { LocalChatConversation } from "@/lib/localHistory";
+import type { ChatMessage } from "@/types";
 import { formatRelativeTime } from "@/lib/utils";
 
 const SUGGESTIONS = [
@@ -24,6 +27,8 @@ const SUGGESTIONS = [
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const openConversationId = searchParams.get("conversation");
   const {
     messages,
     sendMessage,
@@ -52,6 +57,49 @@ export default function ChatPage() {
   useEffect(() => {
     refreshHistory();
   }, [refreshHistory]);
+
+  // Open a conversation from the dashboard (?conversation=<id>): first try
+  // local storage, then load it from the backend (works across devices).
+  useEffect(() => {
+    if (!userId || !openConversationId) return;
+
+    const local = history.find((c) => c.id === openConversationId);
+    if (local) {
+      loadConversation(local);
+      setActiveId(local.id);
+      return;
+    }
+
+    let cancelled = false;
+    getChatConversation(openConversationId)
+      .then((rows: any[]) => {
+        if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
+        const msgs: ChatMessage[] = rows.map((row, i) => ({
+          id: `${openConversationId}-${i}`,
+          role: row.role,
+          content: row.content,
+          createdAt: row.created_at,
+        }));
+        const conv: LocalChatConversation = {
+          id: openConversationId,
+          title:
+            msgs.find((m) => m.role === "user")?.content.slice(0, 50) || "Chat",
+          messages: msgs,
+          createdAt: msgs[0]?.createdAt ?? new Date().toISOString(),
+          updatedAt: msgs[msgs.length - 1]?.createdAt ?? new Date().toISOString(),
+        };
+        loadConversation(conv);
+        setActiveId(conv.id);
+        saveChatConversation(userId, conv);
+        refreshHistory();
+      })
+      .catch(() => {
+        // Not found / offline: leave the chat empty rather than crash.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [openConversationId, userId, history, loadConversation, refreshHistory]);
 
   // Auto-scroll on new messages
   useEffect(() => {

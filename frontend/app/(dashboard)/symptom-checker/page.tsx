@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -14,6 +15,7 @@ import {
 import { SymptomForm } from "@/components/symptom-checker/symptom-form";
 import { SymptomResult } from "@/components/symptom-checker/symptom-result";
 import { checkSymptoms } from "@/services/symptomChecker";
+import { getSymptomCheck } from "@/services/profile";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +37,8 @@ export default function SymptomCheckerPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const openCheckId = searchParams.get("check");
 
   const [view, setView] = useState<ViewState>({ kind: "form" });
   const [history, setHistory] = useState<LocalSymptomRecord[]>([]);
@@ -51,6 +55,62 @@ export default function SymptomCheckerPage() {
   useEffect(() => {
     refreshHistory();
   }, [refreshHistory]);
+
+  // Open a check from the dashboard (?check=<id>): first try local storage,
+  // then load it from the backend (works across devices).
+  useEffect(() => {
+    if (!userId || !openCheckId) return;
+
+    const local = history.find((r) => r.id === openCheckId);
+    if (local) {
+      setView({ kind: "history-detail", record: local });
+      return;
+    }
+
+    let cancelled = false;
+    getSymptomCheck(openCheckId)
+      .then((row: any) => {
+        if (cancelled || !row) return;
+        const req = row.request_payload ?? {};
+        const res = row.response_payload ?? {};
+        const record: LocalSymptomRecord = {
+          id: openCheckId,
+          title: String(req.symptoms ?? "").slice(0, 50) || "Symptom check",
+          formData: {
+            symptoms: req.symptoms ?? "",
+            duration: req.duration ?? "",
+            age: req.age ?? 0,
+            gender: req.gender ?? "prefer_not_to_say",
+            painLevel: req.pain_level ?? 0,
+            weightKg: req.weight_kg,
+            heightCm: req.height_cm,
+            temperatureCelsius: req.temperature_celsius,
+            currentMedication: req.current_medication,
+            knownDiseases: req.known_diseases,
+            allergies: req.allergies,
+          },
+          result: {
+            isEmergency: res.is_emergency ?? false,
+            emergencyMessage: res.emergency_message,
+            symptomSummary: res.symptom_summary,
+            possibleConditions: res.possible_conditions,
+            severity: res.severity,
+            lifestyleSuggestions: res.lifestyle_suggestions,
+            emergencyWarnings: res.emergency_warnings,
+            recommendedSpecialist: res.recommended_specialist,
+            disclaimer: res.disclaimer,
+          },
+          createdAt: row.created_at ?? new Date().toISOString(),
+        };
+        setView({ kind: "history-detail", record });
+      })
+      .catch(() => {
+        // Not found / offline: leave the form visible rather than crash.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [openCheckId, userId, history]);
 
   const mutation = useMutation({
     mutationFn: (values: SymptomCheckRequest) => checkSymptoms(values),

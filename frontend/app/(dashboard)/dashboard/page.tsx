@@ -1,9 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { MessageSquare, Stethoscope, MapPin, ArrowRight, Activity } from "lucide-react";
+import { MessageSquare, Stethoscope, MapPin, ArrowRight, Activity, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,18 +18,31 @@ const QUICK_ACTIONS = [
   { href: "/doctors-near-me", label: "Find Care Nearby", description: "Doctors, clinics & pharmacies", icon: MapPin, tint: "bg-[#eff4ff] text-accent" },
 ];
 
+const HISTORY_DAYS = 10;
+
 export default function DashboardPage() {
   const { user } = useAuth();
 
   const { data: chatHistory, isLoading: chatLoading } = useQuery({
-    queryKey: ["chat-history", 5],
-    queryFn: () => getChatHistory(5),
+    queryKey: ["chat-history", HISTORY_DAYS],
+    queryFn: () => getChatHistory(200, HISTORY_DAYS),
   });
 
   const { data: symptomHistory, isLoading: symptomLoading } = useQuery({
-    queryKey: ["symptom-history", 5],
-    queryFn: () => getSymptomHistory(5),
+    queryKey: ["symptom-history", HISTORY_DAYS],
+    queryFn: () => getSymptomHistory(200, HISTORY_DAYS),
   });
+
+  // Rows are newest-first; keep only the latest message per conversation so
+  // the list shows conversations, not individual messages.
+  const chatConversations = useMemo(() => {
+    const latest = new Map<string, any>();
+    for (const row of chatHistory ?? []) {
+      const key = row.conversation_id ?? row.id;
+      if (!latest.has(key)) latest.set(key, row);
+    }
+    return [...latest.values()];
+  }, [chatHistory]);
 
   const firstName = user?.email?.split("@")[0];
 
@@ -72,60 +86,82 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Recent chats</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <MessageSquare className="h-4 w-4 text-primary" /> Recent chats
+            </CardTitle>
             <Link href="/chat" className="text-xs font-medium text-primary hover:underline">
               Open chat
             </Link>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {chatLoading && (
-              <>
-                <Skeleton className="h-14 w-full" />
-                <Skeleton className="h-14 w-full" />
-              </>
-            )}
-            {!chatLoading && (!chatHistory || chatHistory.length === 0) && (
-              <EmptyState icon={MessageSquare} text="No conversations yet. Start one to see it here." />
-            )}
-            {chatHistory?.slice(0, 4).map((entry: any) => (
-              <div key={entry.id} className="rounded-lg border border-border bg-white p-3 transition-colors hover:border-primary/30">
-                <p className="line-clamp-2 text-sm text-foreground">{entry.content}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
-              </div>
-            ))}
+          <CardContent>
+            <p className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarDays className="h-3 w-3" /> Last {HISTORY_DAYS} days
+            </p>
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+              {chatLoading && (
+                <>
+                  <Skeleton className="h-14 w-full" />
+                  <Skeleton className="h-14 w-full" />
+                </>
+              )}
+              {!chatLoading && chatConversations.length === 0 && (
+                <EmptyState icon={MessageSquare} text="No conversations in the last 10 days. Start one to see it here." />
+              )}
+              {chatConversations.map((entry: any) => (
+                <Link
+                  key={entry.id}
+                  href={entry.conversation_id ? `/chat?conversation=${encodeURIComponent(entry.conversation_id)}` : "/chat"}
+                  className="block rounded-lg border border-border bg-white p-3 transition-colors hover:border-primary/30"
+                >
+                  <p className="line-clamp-2 text-sm text-foreground">{entry.content}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
+                </Link>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base">Recent symptom checks</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Stethoscope className="h-4 w-4 text-secondary" /> Recent symptom checks
+            </CardTitle>
             <Link href="/symptom-checker" className="text-xs font-medium text-primary hover:underline">
               New check
             </Link>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {symptomLoading && (
-              <>
-                <Skeleton className="h-14 w-full" />
-                <Skeleton className="h-14 w-full" />
-              </>
-            )}
-            {!symptomLoading && (!symptomHistory || symptomHistory.length === 0) && (
-              <EmptyState icon={Stethoscope} text="No symptom checks yet. Run one to see it here." />
-            )}
-            {symptomHistory?.slice(0, 4).map((entry: any) => (
-              <div key={entry.id} className="flex items-center justify-between rounded-lg border border-border bg-white p-3 transition-colors hover:border-primary/30">
-                <div className="min-w-0">
-                  <p className="truncate text-sm text-foreground">{entry.request_payload?.symptoms}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
-                </div>
-                {entry.response_payload?.severity && (
-                  <Badge className={severityColor(entry.response_payload.severity)} variant="outline">
-                    {entry.response_payload.severity}
-                  </Badge>
-                )}
-              </div>
-            ))}
+          <CardContent>
+            <p className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
+              <CalendarDays className="h-3 w-3" /> Last {HISTORY_DAYS} days
+            </p>
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+              {symptomLoading && (
+                <>
+                  <Skeleton className="h-14 w-full" />
+                  <Skeleton className="h-14 w-full" />
+                </>
+              )}
+              {!symptomLoading && (!symptomHistory || symptomHistory.length === 0) && (
+                <EmptyState icon={Stethoscope} text="No symptom checks in the last 10 days. Run one to see it here." />
+              )}
+              {symptomHistory?.map((entry: any) => (
+                <Link
+                  key={entry.id}
+                  href={`/symptom-checker?check=${encodeURIComponent(entry.id)}`}
+                  className="flex items-center justify-between rounded-lg border border-border bg-white p-3 transition-colors hover:border-primary/30"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-foreground">{entry.request_payload?.symptoms}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(entry.created_at)}</p>
+                  </div>
+                  {entry.response_payload?.severity && (
+                    <Badge className={severityColor(entry.response_payload.severity)} variant="outline">
+                      {entry.response_payload.severity}
+                    </Badge>
+                  )}
+                </Link>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -138,7 +174,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-3">
           <SummaryStat label="Symptom checks logged" value={symptomHistory?.length ?? 0} />
-          <SummaryStat label="Chat conversations" value={new Set(chatHistory?.map((c: any) => c.conversation_id)).size || 0} />
+          <SummaryStat label="Chat conversations" value={chatConversations.length} />
           <SummaryStat
             label="Last activity"
             value={
