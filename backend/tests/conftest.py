@@ -12,6 +12,7 @@ developer machine into the assertions.
 
 import os
 import sys
+import pytest
 
 BACKEND_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BACKEND_ROOT not in sys.path:
@@ -32,3 +33,13 @@ TEST_ENV = {
 }
 for key, value in TEST_ENV.items():
     os.environ[key] = value
+
+
+@pytest.fixture(autouse=True)
+def clear_overpass_cache():
+    """Ensure the Overpass result cache never leaks between tests."""
+    from app.services.overpass_service import clear_cache
+
+    clear_cache()
+    yield
+    clear_cache()

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Loader2, MapPin, RefreshCw, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,8 @@ export default function DoctorsNearMePage() {
       ),
     enabled: latitude !== null && longitude !== null,
     retry: 1,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 
   return (
