@@ -10,6 +10,10 @@ Every call is anchored by SYSTEM_PROMPT, which is the one place the
 "never diagnose, never prescribe, never claim certainty" rules live for
 the model itself (the emergency short-circuit in emergency_detector.py
 is a separate, non-AI safety layer that runs before this is ever called).
+
+External calls go through app.core.http_client (circuit breaker + retry)
+and timeouts are configurable via GROQ_TIMEOUT_SECONDS /
+GROQ_JSON_TIMEOUT_SECONDS.
 """
 
 import json
@@ -18,6 +22,7 @@ from typing import AsyncGenerator
 import httpx
 
 from app.core.config import get_settings
+from app.core.http_client import request_with_retry, CircuitOpenError
 
 settings = get_settings()
 
@@ -68,7 +73,12 @@ async def stream_chat_completion(
     messages: list[dict[str, str]],
 ) -> AsyncGenerator[str, None]:
     """Yields raw text chunks as they arrive from Groq, for SSE relay
-    to the frontend chat UI."""
+    to the frontend chat UI.
+
+    Streaming payloads are NOT retried (a retried stream would replay
+    tokens the client already received) — failures surface promptly as
+    GroqAPIError after the circuit-breaker check.
+    """
     payload = {
         "model": settings.groq_model,
         "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *messages],
@@ -77,27 +87,33 @@ async def stream_chat_completion(
         "max_tokens": 1024,
     }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        async with client.stream(
-            "POST", GROQ_API_URL, headers=_headers(), json=payload
-        ) as response:
-            if response.status_code != 200:
-                body = await response.aread()
-                raise GroqAPIError(f"Groq API error {response.status_code}: {body!r}")
+    timeout = httpx.Timeout(settings.groq_timeout_seconds, connect=5.0)
+    try:
+        async with httpx.AsyncClient(timeout=timeout) as client:
+            async with client.stream(
+                "POST", GROQ_API_URL, headers=_headers(), json=payload
+            ) as response:
+                if response.status_code != 200:
+                    body = await response.aread()
+                    raise GroqAPIError(f"Groq API error {response.status_code}: {body!r}")
 
-            async for line in response.aiter_lines():
-                if not line or not line.startswith("data:"):
-                    continue
-                data = line[len("data:"):].strip()
-                if data == "[DONE]":
-                    break
-                try:
-                    chunk = json.loads(data)
-                    delta = chunk["choices"][0]["delta"].get("content")
-                    if delta:
-                        yield delta
-                except (json.JSONDecodeError, KeyError, IndexError):
-                    continue
+                async for line in response.aiter_lines():
+                    if not line or not line.startswith("data:"):
+                        continue
+                    data = line[len("data:"):].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data)
+                        delta = chunk["choices"][0]["delta"].get("content")
+                        if delta:
+                            yield delta
+                    except (json.JSONDecodeError, KeyError, IndexError):
+                        continue
+    except CircuitOpenError as exc:
+        raise GroqAPIError(str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise GroqAPIError(f"Could not reach the AI provider: {exc}") from exc
 
 
 async def get_symptom_analysis(prompt: str) -> dict:
@@ -112,8 +128,17 @@ async def get_symptom_analysis(prompt: str) -> dict:
         "response_format": {"type": "json_object"},
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(GROQ_API_URL, headers=_headers(), json=payload)
+    timeout = httpx.Timeout(settings.groq_json_timeout_seconds, connect=5.0)
+    try:
+        response = await request_with_retry(
+            "POST",
+            GROQ_API_URL,
+            timeout=timeout,
+            headers=_headers(),
+            json=payload,
+        )
+    except httpx.HTTPError as exc:
+        raise GroqAPIError(f"Could not reach the AI provider: {exc}") from exc
 
     if response.status_code != 200:
         raise GroqAPIError(f"Groq API error {response.status_code}: {response.text}")
