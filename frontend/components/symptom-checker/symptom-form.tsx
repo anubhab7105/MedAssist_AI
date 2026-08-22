@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
@@ -50,6 +50,8 @@ export function SymptomForm({ onSubmit, loading }: SymptomFormProps) {
     resolver: zodResolver(schema),
     defaultValues: { painLevel: 0, gender: "prefer_not_to_say" },
   });
+
+  const painLevel = useWatch({ control, name: "painLevel" });
 
   const { data: profile } = useQuery({
     queryKey: ["profile"],
@@ -125,7 +127,9 @@ export function SymptomForm({ onSubmit, loading }: SymptomFormProps) {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="painLevel">Pain level</Label>
-          <span className="text-sm text-muted-foreground">{`0–10`}</span>
+          <span className="text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
+            {painLevel ?? 0} / 10
+          </span>
         </div>
         <input
           id="painLevel"
