@@ -16,7 +16,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import get_settings
 from app.core.rate_limit import validate_rate_limit_config, limiter
-from app.api.routes import auth, chat, symptom_checker, doctors, profile
+from app.api.routes import auth, chat, checkin, symptom_checker, doctors, profile
 from app.middleware.logging_middleware import RequestLoggingMiddleware, configure_logging
 
 settings = get_settings()
@@ -68,6 +68,7 @@ app.include_router(chat.router)
 app.include_router(symptom_checker.router)
 app.include_router(doctors.router)
 app.include_router(profile.router)
+app.include_router(checkin.router)
 
 
 def custom_openapi():

@@ -1,5 +1,8 @@
+import logging
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
+from dateutil.parser import isoparse
 from fastapi import APIRouter, Depends, HTTPException, Query
 from postgrest.exceptions import APIError
 
@@ -7,11 +10,31 @@ from app.core.security import get_current_user, AuthenticatedUser
 from app.models.schemas import ProfileUpdateRequest
 from app.services.supabase_service import ensure_user_profile, get_supabase
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/v1/profile", tags=["profile"])
+
+# Recovery mode auto-expires after this many hours without a new check-in.
+_RECOVERY_EXPIRY_HOURS = 24
 
 
 def _days_cutoff(days: int) -> str:
     return (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+
+
+def _should_expire_recovery(profile: dict) -> bool:
+    """Phase 0 decision 3: lazy auto-expiry. Recovery mode expires if
+    last_recovery_date is more than 24 hours in the past."""
+    if not profile.get("is_recovery_mode"):
+        return False
+    last_recovery = profile.get("last_recovery_date")
+    if not last_recovery:
+        # No recovery date recorded but mode is on — expire it.
+        return True
+    if isinstance(last_recovery, str):
+        last_recovery = isoparse(last_recovery)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=_RECOVERY_EXPIRY_HOURS)
+    return last_recovery < cutoff
 
 
 @router.get("")
@@ -20,9 +43,26 @@ async def get_profile(user: AuthenticatedUser = Depends(get_current_user)):
     client = get_supabase()
     try:
         result = client.table("users").select("*").eq("id", user.user_id).single().execute()
-        return result.data
+        profile = result.data
     except APIError:
-        return await ensure_user_profile(user.user_id, user.email)
+        profile = await ensure_user_profile(user.user_id, user.email)
+
+    # Lazy auto-expiry: clear recovery mode if it's stale (Phase 0, decision 3).
+    if profile and _should_expire_recovery(profile):
+        try:
+            client.table("users").update({
+                "is_recovery_mode": False,
+            }).eq("id", user.user_id).execute()
+            profile["is_recovery_mode"] = False
+            logger.info("Auto-expired recovery mode for user=%s", user.user_id)
+        except APIError as exc:
+            logger.warning(
+                "Unable to auto-expire recovery mode for user=%s: %s",
+                user.user_id, exc,
+            )
+
+    return profile
+
 
 
 @router.put("")
