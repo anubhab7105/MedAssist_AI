@@ -119,3 +119,24 @@ create policy "Users can insert own symptom history" on public.symptom_history
 
 create policy "Users can manage own saved locations" on public.saved_locations
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------
+-- Recovery Mode: add recovery-related columns to users
+-- ---------------------------------------------------------------------
+alter table public.users
+  add column if not exists is_recovery_mode boolean not null default false,
+  add column if not exists daily_goal_target integer not null default 8000,
+  add column if not exists current_streak integer not null default 0,
+  add column if not exists last_recovery_date timestamptz;
+
+-- Backfill existing rows with sane defaults (idempotent — the column
+-- defaults handle new rows, this covers any rows created before the
+-- migration where the default wasn't applied retroactively).
+update public.users
+set
+  is_recovery_mode = coalesce(is_recovery_mode, false),
+  daily_goal_target = coalesce(daily_goal_target, 8000),
+  current_streak = coalesce(current_streak, 0)
+where is_recovery_mode is null
+   or daily_goal_target is null
+   or current_streak is null;
