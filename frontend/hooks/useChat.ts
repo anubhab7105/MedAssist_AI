@@ -16,7 +16,7 @@ export function useChat() {
   const conversationIdRef = useRef<string | null>(null);
   const abortController = useRef<AbortController | null>(null);
 
-  const sendMessage = useCallback(async (content: string) => {
+  const sendMessage = useCallback(async (content: string, image?: string) => {
     setError(null);
     conversationIdRef.current ??= genId();
 
@@ -24,6 +24,7 @@ export function useChat() {
       id: genId(),
       role: "user",
       content,
+      image,
       createdAt: new Date().toISOString(),
     };
 
@@ -54,6 +55,7 @@ export function useChat() {
             )
           );
         },
+        image,
         abortController.current.signal
       );
     } catch (err) {

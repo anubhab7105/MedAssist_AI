@@ -45,6 +45,16 @@ export function ChatMessageBubble({ message }: { message: ChatMessageType }) {
             : "rounded-tl-sm border border-secondary/10 bg-secondary/5 text-foreground"
         )}
       >
+        {message.image && (
+          <div className="mb-2">
+            <img 
+              src={message.image} 
+              alt="Attached" 
+              className="max-w-full rounded-md border border-black/10 shadow-sm" 
+              style={{ maxHeight: '300px', objectFit: 'contain' }}
+            />
+          </div>
+        )}
         {isUser ? (
           <p className="whitespace-pre-wrap">{message.content}</p>
         ) : message.content ? (
