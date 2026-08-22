@@ -26,7 +26,7 @@ TEST_ENV = {
     "SUPABASE_SERVICE_ROLE_KEY": "test-service-role-key",
     "SUPABASE_JWT_SECRET": "test-jwt-secret-at-least-32-characters-long!!",
     "GROQ_API_KEY": "test-groq-key",
-    "GROQ_MODEL": "llama-3.3-70b-versatile",
+    "GROQ_MODEL": "llama3-8b-8192",
     "OVERPASS_API_URL": "https://overpass-api.de/api/interpreter",
     "RATE_LIMIT_PER_MINUTE": "20",
     "LOG_LEVEL": "INFO",

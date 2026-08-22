@@ -36,7 +36,7 @@ services:
         sync: false
 
       - key: GROQ_MODEL
-        value: llama-3.3-70b-versatile
+        value: llama3-8b-8192
 
       - key: OVERPASS_API_URL
         value: https://overpass-api.de/api/interpreter
