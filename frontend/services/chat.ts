@@ -14,6 +14,7 @@ export async function streamChatMessage(
   message: string,
   conversationId: string | null,
   onChunk: (chunk: StreamChunk) => void,
+  image?: string,
   signal?: AbortSignal
 ): Promise<void> {
   const supabase = createClient();
@@ -37,7 +38,7 @@ export async function streamChatMessage(
       "Content-Type": "application/json",
       Authorization: `Bearer ${session.access_token}`,
     },
-    body: JSON.stringify({ message, conversation_id: conversationId }),
+    body: JSON.stringify({ message, conversation_id: conversationId, image }),
     signal,
   });
 

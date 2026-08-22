@@ -70,7 +70,8 @@ def _headers() -> dict:
 
 
 async def stream_chat_completion(
-    messages: list[dict[str, str]],
+    messages: list[dict],
+    image: str | None = None
 ) -> AsyncGenerator[str, None]:
     """Yields raw text chunks as they arrive from Groq, for SSE relay
     to the frontend chat UI.
@@ -79,9 +80,21 @@ async def stream_chat_completion(
     tokens the client already received) — failures surface promptly as
     GroqAPIError after the circuit-breaker check.
     """
+    model_to_use = settings.groq_model
+    formatted_messages = list(messages)
+
+    if image:
+        model_to_use = settings.groq_vision_model
+        if formatted_messages and formatted_messages[-1].get("role") == "user":
+            user_text = formatted_messages[-1]["content"]
+            formatted_messages[-1]["content"] = [
+                {"type": "text", "text": user_text},
+                {"type": "image_url", "image_url": {"url": image}}
+            ]
+
     payload = {
-        "model": settings.groq_model,
-        "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *messages],
+        "model": model_to_use,
+        "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *formatted_messages],
         "temperature": 0.4,
         "stream": True,
         "max_tokens": 1024,
