@@ -1,8 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
-from dateutil.parser import isoparse
 from fastapi import APIRouter, Depends, HTTPException, Query
 from postgrest.exceptions import APIError
 
@@ -32,7 +30,7 @@ def _should_expire_recovery(profile: dict) -> bool:
         # No recovery date recorded but mode is on — expire it.
         return True
     if isinstance(last_recovery, str):
-        last_recovery = isoparse(last_recovery)
+        last_recovery = datetime.fromisoformat(last_recovery)
     cutoff = datetime.now(timezone.utc) - timedelta(hours=_RECOVERY_EXPIRY_HOURS)
     return last_recovery < cutoff
 
