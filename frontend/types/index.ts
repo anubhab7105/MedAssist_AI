@@ -57,6 +57,10 @@ export interface UserProfile {
   gender?: Gender | null;
   weight_kg?: number | null;
   height_cm?: number | null;
+  is_recovery_mode: boolean;
+  daily_goal_target: number;
+  current_streak: number;
+  last_recovery_date?: string | null;
   created_at: string;
   updated_at?: string;
 }
@@ -66,4 +70,28 @@ export interface SymptomHistoryEntry {
   request_payload: SymptomCheckRequest;
   response_payload: SymptomCheckResponse;
   created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Check-In / Recovery Mode
+// ---------------------------------------------------------------------------
+
+export interface CheckInResponse {
+  recovery_triggered: boolean;
+  confidence: number;
+  summary: string;
+}
+
+export type RecoveryActivityCategory =
+  | "hydration"
+  | "rest"
+  | "breathing"
+  | "stretching"
+  | "mindfulness"
+  | "nutrition";
+
+export interface RecoveryActivityResponse {
+  activity: string;
+  duration_minutes: number;
+  category: RecoveryActivityCategory;
 }
