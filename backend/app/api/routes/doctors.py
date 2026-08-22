@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 
+from app.core.config import get_settings
 from app.core.rate_limit import limiter, DEFAULT_RATE
 from app.core.security import get_current_user, AuthenticatedUser
 from app.models.schemas import NearbyPlacesRequest, NearbyPlacesResponse
-from app.services.overpass_service import find_nearby_places
+
+_settings = get_settings()
+if _settings.use_google_places:
+    from app.services.google_places_service import find_nearby_places
+else:
+    from app.services.overpass_service import find_nearby_places
 
 router = APIRouter(prefix="/api/v1/doctors", tags=["doctors"])
 

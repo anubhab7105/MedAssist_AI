@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     # --- Overpass ---
     overpass_api_url: str = "https://overpass-api.de/api/interpreter"
 
+    # --- Google Places ---
+    google_places_api_key: str = ""
+    google_places_timeout_seconds: float = 10.0
+
+    # --- Feature flag ---
+    use_google_places: bool = True
+
     # --- External service timeouts (seconds) ---
     groq_timeout_seconds: float = 60.0
     groq_json_timeout_seconds: float = 30.0

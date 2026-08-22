@@ -61,7 +61,7 @@ export function PlaceCard({ place, selected, onSelect, userLat, userLng }: Place
               </a>
             )}
             <a
-              href={`https://www.openstreetmap.org/directions?from=${userLat}%2C${userLng}&to=${place.latitude}%2C${place.longitude}`}
+              href={`https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${place.latitude},${place.longitude}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}

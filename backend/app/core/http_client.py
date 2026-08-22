@@ -1,5 +1,5 @@
 """
-Resilient HTTP calls for external services (Groq, Overpass).
+Resilient HTTP calls for external services (Groq, Google Places, Overpass).
 
 Provides:
 - CircuitBreaker: per-host, consecutive-failure based, with an automatic
