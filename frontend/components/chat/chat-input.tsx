@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState, type KeyboardEvent, type ChangeEvent } from "react";
-import { Send, Square, Paperclip, X } from "lucide-react";
+import { Send, Square, Paperclip, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ChatInputProps {
-  onSend: (message: string, image?: string) => void;
+  onSend: (message: string, attachment?: string) => void;
   isStreaming: boolean;
   onStop: () => void;
 }
@@ -13,19 +13,21 @@ interface ChatInputProps {
 export function ChatInput({ onSend, isStreaming, onStop }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imageBase64, setImageBase64] = useState<string | undefined>();
+  const [attachmentBase64, setAttachmentBase64] = useState<string | undefined>();
+  const [attachmentType, setAttachmentType] = useState<"image" | "pdf" | undefined>();
 
   function handleSubmit() {
     const value = textareaRef.current?.value.trim();
-    if ((!value && !imageBase64) || isStreaming) return;
+    if ((!value && !attachmentBase64) || isStreaming) return;
     
-    onSend(value || "", imageBase64);
+    onSend(value || "", attachmentBase64);
     
     if (textareaRef.current) {
       textareaRef.current.value = "";
       textareaRef.current.style.height = "auto";
     }
-    setImageBase64(undefined);
+    setAttachmentBase64(undefined);
+    setAttachmentType(undefined);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -46,24 +48,46 @@ export function ChatInput({ onSend, isStreaming, onStop }: ChatInputProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const isPDF = file.type === "application/pdf";
+    const isImage = file.type.startsWith("image/");
+    
+    if (!isPDF && !isImage) return;
+
     const reader = new FileReader();
     reader.onload = (event) => {
-      setImageBase64(event.target?.result as string);
+      setAttachmentBase64(event.target?.result as string);
+      setAttachmentType(isPDF ? "pdf" : "image");
     };
     reader.readAsDataURL(file);
     // Reset input so the same file can be uploaded again if removed
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  function removeAttachment() {
+    setAttachmentBase64(undefined);
+    setAttachmentType(undefined);
+  }
+
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-input bg-white p-2 shadow-soft transition-shadow focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(0,49,120,0.10)]">
-      {imageBase64 && (
-        <div className="relative w-20 h-20 mb-2">
-          <img src={imageBase64} alt="Upload preview" className="object-cover w-full h-full rounded-md border" />
+      {attachmentBase64 && (
+        <div className="relative w-20 h-20 mb-2 flex items-center justify-center">
+          {attachmentType === "image" ? (
+            <img 
+              src={attachmentBase64} 
+              alt="Upload preview" 
+              className="object-cover w-full h-full rounded-md border" 
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-1 rounded-md border bg-muted/50 p-2 text-center">
+              <FileText className="h-8 w-8 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">PDF</span>
+            </div>
+          )}
           <button 
-            onClick={() => setImageBase64(undefined)}
+            onClick={removeAttachment}
             className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 border shadow-sm hover:bg-gray-100"
-            aria-label="Remove image"
+            aria-label="Remove attachment"
           >
             <X className="w-4 h-4 text-gray-600" />
           </button>
@@ -75,14 +99,15 @@ export function ChatInput({ onSend, isStreaming, onStop }: ChatInputProps) {
           variant="ghost" 
           size="icon" 
           onClick={() => fileInputRef.current?.click()}
-          aria-label="Attach image"
+          aria-label="Attach file"
           className="text-muted-foreground hover:text-foreground"
+          disabled={isStreaming || !!attachmentBase64}
         >
           <Paperclip className="h-5 w-5" />
         </Button>
         <input 
           type="file" 
-          accept="image/*" 
+          accept="image/*,application/pdf" 
           className="hidden" 
           ref={fileInputRef} 
           onChange={handleFileChange} 
@@ -101,7 +126,7 @@ export function ChatInput({ onSend, isStreaming, onStop }: ChatInputProps) {
             <Square className="h-4 w-4" />
           </Button>
         ) : (
-          <Button size="icon" onClick={handleSubmit} aria-label="Send message" disabled={!textareaRef.current?.value.trim() && !imageBase64}>
+          <Button size="icon" onClick={handleSubmit} aria-label="Send message" disabled={!textareaRef.current?.value.trim() && !attachmentBase64}>
             <Send className="h-4 w-4" />
           </Button>
         )}
