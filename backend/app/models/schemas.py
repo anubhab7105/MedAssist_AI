@@ -41,6 +41,7 @@ class ChatRole(str, Enum):
 class ChatMessageIn(BaseModel):
     conversation_id: Optional[str] = None
     message: str = Field(..., min_length=1, max_length=4000)
+    image: Optional[str] = None
 
     @field_validator("message")
     @classmethod
@@ -51,6 +52,7 @@ class ChatMessageIn(BaseModel):
 class ChatMessageOut(BaseModel):
     role: ChatRole
     content: str
+    image: Optional[str] = None
     created_at: datetime
 
 

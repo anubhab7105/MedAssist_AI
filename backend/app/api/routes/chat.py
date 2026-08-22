@@ -42,7 +42,12 @@ async def chat(
             yield "data: [DONE]\n\n"
 
         await supabase_service.save_chat_message(
-            user.user_id, payload.conversation_id, "user", payload.message, user.email
+            user_id=user.user_id,
+            conversation_id=payload.conversation_id,
+            role="user",
+            content=payload.message,
+            email=user.email,
+            image=payload.image
         )
         await supabase_service.save_chat_message(
             user.user_id, payload.conversation_id, "assistant", message, user.email
@@ -51,13 +56,19 @@ async def chat(
         return StreamingResponse(emergency_stream(), media_type="text/event-stream")
 
     await supabase_service.save_chat_message(
-        user.user_id, payload.conversation_id, "user", payload.message, user.email
+        user_id=user.user_id,
+        conversation_id=payload.conversation_id,
+        role="user",
+        content=payload.message,
+        email=user.email,
+        image=payload.image
     )
 
     async def token_stream():
         full_response = ""
         try:
-            async for chunk in stream_chat_completion([{"role": "user", "content": payload.message}]):
+            messages = [{"role": "user", "content": payload.message}]
+            async for chunk in stream_chat_completion(messages, image=payload.image):
                 full_response += chunk
                 yield f"data: {json.dumps({'type': 'token', 'content': chunk})}\n\n"
         finally:

@@ -48,7 +48,7 @@ def _truncate(value: str, limit: int) -> str:
 
 
 async def save_chat_message(
-    user_id: str, conversation_id: str | None, role: str, content: str, email: str | None = None
+    user_id: str, conversation_id: str | None, role: str, content: str, email: str | None = None, image: str | None = None
 ) -> dict:
     client = get_supabase()
     await ensure_user_profile(user_id, email)
@@ -57,6 +57,8 @@ async def save_chat_message(
         "role": role,
         "content": _truncate(content, _MAX_CONTENT_CHARS),
     }
+    if image:
+        row["image"] = image
     if conversation_id:
         row["conversation_id"] = conversation_id
     try:

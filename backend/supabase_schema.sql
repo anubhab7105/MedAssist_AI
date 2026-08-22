@@ -54,11 +54,14 @@ create table if not exists public.chat_history (
   conversation_id uuid not null default gen_random_uuid(),
   role text not null check (role in ('user', 'assistant')),
   content text not null,
+  image text,
   created_at timestamptz not null default now()
 );
 
 create index if not exists chat_history_user_id_idx on public.chat_history(user_id);
 create index if not exists chat_history_conversation_id_idx on public.chat_history(conversation_id);
+
+alter table public.chat_history add column if not exists image text;
 
 -- ---------------------------------------------------------------------
 -- symptom_history

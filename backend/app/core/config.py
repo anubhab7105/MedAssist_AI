@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # --- Groq ---
     groq_api_key: str
     groq_model: str = "llama-3.3-70b-versatile"
+    groq_vision_model: str = "llama-3.2-90b-vision-preview"
 
     # --- Recovery Mode ---
     recovery_trigger_threshold: float = 0.6
