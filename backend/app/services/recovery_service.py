@@ -108,7 +108,7 @@ async def evaluate_checkin(text: str) -> CheckInResponse:
 
     # Stage 1: Groq strain classification (JSON mode)
     payload = {
-        "model": settings.groq_model,
+        "model": settings.groq_json_model,
         "messages": [
             {"role": "system", "content": _CHECKIN_SYSTEM_PROMPT},
             {"role": "user", "content": text},
@@ -154,7 +154,7 @@ async def evaluate_checkin(text: str) -> CheckInResponse:
 async def generate_recovery_activity(context: str) -> RecoveryActivityResponse:
     """Generate a short recovery activity tailored to the check-in context."""
     payload = {
-        "model": settings.groq_model,
+        "model": settings.groq_json_model,
         "messages": [
             {"role": "system", "content": _ACTIVITY_SYSTEM_PROMPT},
             {"role": "user", "content": f"User's check-in: {context}"},

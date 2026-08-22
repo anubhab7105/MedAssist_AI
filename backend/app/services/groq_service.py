@@ -80,7 +80,7 @@ async def stream_chat_completion(
     tokens the client already received) — failures surface promptly as
     GroqAPIError after the circuit-breaker check.
     """
-    model_to_use = settings.groq_model
+    model_to_use = settings.groq_chat_model
     formatted_messages = list(messages)
 
     if image:
@@ -131,7 +131,7 @@ async def stream_chat_completion(
 
 async def get_symptom_analysis(prompt: str) -> dict:
     payload = {
-        "model": settings.groq_model,
+        "model": settings.groq_json_model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT + "\n\n" + SYMPTOM_JSON_INSTRUCTIONS},
             {"role": "user", "content": prompt},

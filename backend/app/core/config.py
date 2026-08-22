@@ -40,7 +40,8 @@ class Settings(BaseSettings):
 
     # --- Groq ---
     groq_api_key: str
-    groq_model: str = "groq/compound-mini"
+    groq_chat_model: str = "groq/compound-mini"
+    groq_json_model: str = "llama-3.1-8b-instant"
     groq_vision_model: str = "llama-3.2-90b-vision-preview"
 
     # --- Recovery Mode ---
