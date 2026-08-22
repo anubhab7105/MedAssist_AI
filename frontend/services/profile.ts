@@ -8,6 +8,10 @@ export interface ProfileUpdatePayload {
   gender?: Gender;
   weight_kg?: number;
   height_cm?: number;
+  is_recovery_mode?: boolean;
+  daily_goal_target?: number;
+  current_streak?: number;
+  last_recovery_date?: string;
 }
 
 export async function getProfile(): Promise<UserProfile> {

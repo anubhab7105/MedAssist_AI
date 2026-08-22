@@ -6,7 +6,7 @@ sync — the two are meant to mirror each other field-for-field.
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -130,6 +130,40 @@ class NearbyPlacesResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Check-In / Recovery Mode
+# ---------------------------------------------------------------------------
+
+class CheckInRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=4000)
+
+    @field_validator("text")
+    @classmethod
+    def strip_text(cls, v: str) -> str:
+        return v.strip()
+
+
+class CheckInResponse(BaseModel):
+    recovery_triggered: bool
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    summary: str
+
+
+class RecoveryActivityCategory(str, Enum):
+    hydration = "hydration"
+    rest = "rest"
+    breathing = "breathing"
+    stretching = "stretching"
+    mindfulness = "mindfulness"
+    nutrition = "nutrition"
+
+
+class RecoveryActivityResponse(BaseModel):
+    activity: str
+    duration_minutes: int = Field(..., ge=1)
+    category: RecoveryActivityCategory
+
+
+# ---------------------------------------------------------------------------
 # Profile
 # ---------------------------------------------------------------------------
 
@@ -140,3 +174,24 @@ class ProfileUpdateRequest(BaseModel):
     gender: Optional[Gender] = None
     weight_kg: Optional[float] = Field(None, ge=1, le=400)
     height_cm: Optional[float] = Field(None, ge=30, le=272)
+    is_recovery_mode: Optional[bool] = None
+    daily_goal_target: Optional[int] = Field(None, ge=1)
+    current_streak: Optional[int] = Field(None, ge=0)
+    last_recovery_date: Optional[datetime] = None
+
+
+class ProfileResponse(BaseModel):
+    id: str
+    email: str
+    full_name: Optional[str] = None
+    medical_history: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    weight_kg: Optional[float] = None
+    height_cm: Optional[float] = None
+    is_recovery_mode: bool = False
+    daily_goal_target: int = 8000
+    current_streak: int = 0
+    last_recovery_date: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime

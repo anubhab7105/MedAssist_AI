@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     groq_api_key: str
     groq_model: str = "llama-3.3-70b-versatile"
 
+    # --- Recovery Mode ---
+    recovery_trigger_threshold: float = 0.6
+
     # --- Overpass ---
     overpass_api_url: str = "https://overpass-api.de/api/interpreter"
 
