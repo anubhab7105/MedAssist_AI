@@ -97,6 +97,9 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SUPABASE_JWT_SECRET=your-supabase-jwt-secret
 GROQ_API_KEY=your-groq-api-key
 GROQ_MODEL=llama-3.3-70b-versatile
+OVERPASS_API_URL=https://overpass-api.de/api/interpreter
+GOOGLE_PLACES_API_KEY=your-google-places-api-key
+USE_GOOGLE_PLACES=true
 RATE_LIMIT_PER_MINUTE=20
 LOG_LEVEL=INFO
 ```

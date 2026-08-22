@@ -41,5 +41,11 @@ services:
       - key: OVERPASS_API_URL
         value: https://overpass-api.de/api/interpreter
 
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+
+      - key: USE_GOOGLE_PLACES
+        value: "true"
+
       - key: RATE_LIMIT_PER_MINUTE
         value: "20"
