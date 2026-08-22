@@ -89,6 +89,8 @@ export default function DashboardPage() {
         <p className="mt-1 text-muted-foreground">Here&apos;s a quick look at your health workspace.</p>
       </div>
 
+      <CheckInWidget onCheckInComplete={handleCheckInComplete} />
+
       <div className="grid gap-4 sm:grid-cols-3">
         {QUICK_ACTIONS.map((action) => (
           <Link key={action.href} href={action.href}>
