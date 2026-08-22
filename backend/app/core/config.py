@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     # --- Groq ---
     groq_api_key: str
-    groq_model: str = "llama3-8b-8192"
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # --- Recovery Mode ---
     recovery_trigger_threshold: float = 0.6
