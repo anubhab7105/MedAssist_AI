@@ -2,15 +2,18 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { MessageSquare, Stethoscope, MapPin, ArrowRight, Activity, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
-import { getChatHistory, getSymptomHistory } from "@/services/profile";
+import { getProfile, getChatHistory, getSymptomHistory } from "@/services/profile";
 import { formatRelativeTime, severityColor } from "@/lib/utils";
+import type { UserProfile, CheckInResponse } from "@/types";
+import RecoveryDashboard from "@/components/recovery/RecoveryDashboard";
+import CheckInWidget from "@/components/recovery/CheckInWidget";
 
 const QUICK_ACTIONS = [
   { href: "/chat", label: "Start AI Chat", description: "Ask a health question", icon: MessageSquare, tint: "bg-[#dce9ff] text-primary" },
