@@ -25,6 +25,12 @@ const HISTORY_DAYS = 10;
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: profile } = useQuery<UserProfile>({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+  });
 
   const { data: chatHistory, isLoading: chatLoading } = useQuery({
     queryKey: ["chat-history", HISTORY_DAYS],
@@ -35,6 +41,22 @@ export default function DashboardPage() {
     queryKey: ["symptom-history", HISTORY_DAYS],
     queryFn: () => getSymptomHistory(200, HISTORY_DAYS),
   });
+
+  const handleCheckInComplete = (result: CheckInResponse) => {
+    // If recovery was triggered, the backend updated the profile —
+    // re-fetch so the dashboard switches to RecoveryDashboard.
+    if (result.recovery_triggered) {
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    }
+  };
+
+  // Phase 7: if recovery mode is active, show the recovery dashboard.
+  // Auto-expiry (Phase 0, decision 3) clears is_recovery_mode on the
+  // next GET /profile, so this check naturally resolves back without
+  // extra frontend polling.
+  if (profile?.is_recovery_mode) {
+    return <RecoveryDashboard profile={profile} />;
+  }
 
   // Rows are newest-first; keep only the latest message per conversation so
   // the list shows conversations, not individual messages.
