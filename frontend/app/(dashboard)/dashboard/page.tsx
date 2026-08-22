@@ -11,9 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { getProfile, getChatHistory, getSymptomHistory } from "@/services/profile";
 import { formatRelativeTime, severityColor } from "@/lib/utils";
-import type { UserProfile, CheckInResponse } from "@/types";
+import type { UserProfile } from "@/types";
 import RecoveryDashboard from "@/components/recovery/RecoveryDashboard";
-import CheckInWidget from "@/components/recovery/CheckInWidget";
 
 const QUICK_ACTIONS = [
   { href: "/chat", label: "Start AI Chat", description: "Ask a health question", icon: MessageSquare, tint: "bg-[#dce9ff] text-primary" },
@@ -42,13 +41,7 @@ export default function DashboardPage() {
     queryFn: () => getSymptomHistory(200, HISTORY_DAYS),
   });
 
-  const handleCheckInComplete = (result: CheckInResponse) => {
-    // If recovery was triggered, the backend updated the profile —
-    // re-fetch so the dashboard switches to RecoveryDashboard.
-    if (result.recovery_triggered) {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-    }
-  };
+
 
   // Phase 7: if recovery mode is active, show the recovery dashboard.
   // Auto-expiry (Phase 0, decision 3) clears is_recovery_mode on the
@@ -89,7 +82,7 @@ export default function DashboardPage() {
         <p className="mt-1 text-muted-foreground">Here&apos;s a quick look at your health workspace.</p>
       </div>
 
-      <CheckInWidget onCheckInComplete={handleCheckInComplete} />
+
 
       <div className="grid gap-4 sm:grid-cols-3">
         {QUICK_ACTIONS.map((action) => (
