@@ -19,7 +19,7 @@ const STAGES = [
 ];
 
 function getStage(minutes: number) {
-  let result = STAGES[0];
+  let result = STAGES[0]!;
   for (const stage of STAGES) {
     if (minutes >= stage.min) result = stage;
   }
