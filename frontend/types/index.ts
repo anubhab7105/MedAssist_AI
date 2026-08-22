@@ -7,9 +7,9 @@ export interface ChatMessage {
   id: string;
   role: ChatRole;
   content: string;
-  image?: string;
   createdAt: string;
   isEmergency?: boolean;
+  image?: string;
 }
 
 export interface SymptomCheckRequest {
