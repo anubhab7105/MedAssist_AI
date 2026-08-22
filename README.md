@@ -165,3 +165,5 @@ uvicorn app.main:app --reload
 ## Safety Disclaimer
 
 MedAssist AI is a hackathon prototype for educational and informational use. It does not diagnose, prescribe medication, or replace emergency care. Users with urgent symptoms should contact local emergency services or a qualified medical professional.
+
+soumyajit 
