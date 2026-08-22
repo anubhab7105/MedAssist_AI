@@ -30,7 +30,8 @@ export async function streamChatMessage(
     throw new Error("AI Chat is not configured. Missing NEXT_PUBLIC_API_URL.");
   }
 
-  const response = await fetch(`${apiUrl}/api/v1/chat`, {
+  const normalizedUrl = apiUrl.replace(/\/+$/, '');
+  const response = await fetch(`${normalizedUrl}/api/v1/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
