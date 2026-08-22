@@ -3,6 +3,8 @@ PDF processing utilities for extracting text from uploaded PDF files.
 """
 import io
 import logging
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
 from PyPDF2 import PdfReader
@@ -15,36 +17,29 @@ MAX_PDF_SIZE = 5 * 1024 * 1024
 MAX_PAGES = 10
 # Max characters to extract
 MAX_CHARS = 10000
+# Timeout for PDF extraction (seconds)
+PDF_EXTRACTION_TIMEOUT = 30.0
+
+# Thread pool for CPU-bound PDF extraction
+_pdf_executor = ThreadPoolExecutor(max_workers=2)
 
 
-async def extract_text_from_pdf(pdf_base64: str) -> Optional[str]:
-    """
-    Extract text from a base64-encoded PDF.
-    
-    Args:
-        pdf_base64: Base64 string (with or without data: prefix)
-        
-    Returns:
-        Extracted text or None if extraction fails
-    """
+def _extract_text_sync(pdf_base64: str) -> Optional[str]:
+    """Synchronous PDF text extraction (runs in thread pool)."""
     try:
         # Remove data: prefix if present
         if pdf_base64.startswith("data:"):
-            # Find the comma separator
             comma_idx = pdf_base64.find(",")
             if comma_idx != -1:
                 pdf_base64 = pdf_base64[comma_idx + 1:]
         
-        # Decode base64
         import base64
         pdf_bytes = base64.b64decode(pdf_base64)
         
-        # Check size
         if len(pdf_bytes) > MAX_PDF_SIZE:
             logger.warning(f"PDF too large: {len(pdf_bytes)} bytes")
             return f"[PDF too large to process: {len(pdf_bytes) / 1024 / 1024:.1f}MB. Max is {MAX_PDF_SIZE / 1024 / 1024}MB]"
         
-        # Extract text
         pdf_file = io.BytesIO(pdf_bytes)
         reader = PdfReader(pdf_file)
         
@@ -62,7 +57,6 @@ async def extract_text_from_pdf(pdf_base64: str) -> Optional[str]:
             try:
                 page_text = page.extract_text()
                 if page_text:
-                    # Limit characters per page
                     if total_chars + len(page_text) > MAX_CHARS:
                         remaining = MAX_CHARS - total_chars
                         if remaining > 100:
@@ -82,6 +76,24 @@ async def extract_text_from_pdf(pdf_base64: str) -> Optional[str]:
         
     except Exception as e:
         logger.error(f"PDF text extraction failed: {e}")
+        return f"[PDF processing error: {str(e)}]"
+
+
+async def extract_text_from_pdf(pdf_base64: str) -> Optional[str]:
+    """
+    Extract text from a base64-encoded PDF with timeout.
+    Runs in thread pool to avoid blocking the event loop.
+    """
+    try:
+        return await asyncio.wait_for(
+            asyncio.get_event_loop().run_in_executor(_pdf_executor, _extract_text_sync, pdf_base64),
+            timeout=PDF_EXTRACTION_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        logger.error("PDF extraction timed out")
+        return "[PDF processing timed out - file may be too complex]"
+    except Exception as e:
+        logger.error(f"PDF extraction failed: {e}")
         return f"[PDF processing error: {str(e)}]"
 
 

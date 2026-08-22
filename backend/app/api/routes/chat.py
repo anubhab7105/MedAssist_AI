@@ -12,6 +12,7 @@ Flow per request:
 """
 
 import json
+import logging
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
@@ -23,6 +24,8 @@ from app.services.emergency_detector import detect_emergency, get_emergency_mess
 from app.services.groq_service import stream_chat_completion
 from app.services import supabase_service
 from app.services.pdf_service import extract_text_from_pdf, is_pdf_base64
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
 
@@ -60,7 +63,9 @@ async def chat(
     # Process PDF if present
     pdf_text = None
     if payload.image and is_pdf_base64(payload.image):
+        logger.info("PDF detected, extracting text...")
         pdf_text = await extract_text_from_pdf(payload.image)
+        logger.info(f"PDF extraction complete, text length: {len(pdf_text) if pdf_text else 0}")
         # For PDFs, we don't send the image to Groq (vision model doesn't support PDF)
         # Instead we include extracted text as context
         image_for_groq = None
@@ -71,6 +76,7 @@ async def chat(
     user_message = payload.message
     if pdf_text:
         user_message = f"{payload.message}\n\n--- PDF Content ---\n{pdf_text}\n--- End PDF ---"
+        logger.info(f"Total message length with PDF: {len(user_message)}")
 
     await supabase_service.save_chat_message(
         user_id=user.user_id,
@@ -85,9 +91,14 @@ async def chat(
         full_response = ""
         try:
             messages = [{"role": "user", "content": user_message}]
+            logger.info(f"Calling Groq with model: {'vision' if image_for_groq else 'text'}, has_image: {bool(image_for_groq)}")
             async for chunk in stream_chat_completion(messages, image=image_for_groq):
                 full_response += chunk
                 yield f"data: {json.dumps({'type': 'token', 'content': chunk})}\n\n"
+            logger.info("Groq stream completed")
+        except Exception as e:
+            logger.error(f"Groq stream error: {e}")
+            raise
         finally:
             if full_response:
                 await supabase_service.save_chat_message(
